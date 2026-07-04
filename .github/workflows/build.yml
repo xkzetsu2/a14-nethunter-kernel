@@ -34,7 +34,7 @@ jobs:
 
       - name: Disable LTO & KASAN & BTF
         run: |
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- exynos850-nethunter_defconfig
+          make ARCH=arm64 CC=aarch64-linux-gnu-gcc CROSS_COMPILE=aarch64-linux-gnu- exynos850-nethunter_defconfig
           scripts/config --file .config --disable LTO_NONE
           scripts/config --file .config --disable LTO_CLANG
           scripts/config --file .config --disable THINLTO
@@ -46,7 +46,7 @@ jobs:
 
       - name: Build kernel
         run: |
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j$(nproc)
+          make ARCH=arm64 CC=aarch64-linux-gnu-gcc CROSS_COMPILE=aarch64-linux-gnu- KCFLAGS="-Wno-strict-prototypes -Wno-int-conversion -Wno-implicit-int -Wno-deprecated-non-prototype" -j$(nproc)
 
       - name: Prepare artifacts
         run: |
