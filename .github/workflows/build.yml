@@ -43,6 +43,7 @@ jobs:
           scripts/config --file .config --disable KASAN_INLINE
           scripts/config --file .config --disable KASAN_STACK
           scripts/config --file .config --disable DEBUG_INFO_BTF
+          scripts/config --file .config --disable PCIEAER
           # Fix Werror in Makefile (Samsung vendor code breaks with -Werror)
           sed -i 's/-Werror=strict-prototypes/-Wno-error=strict-prototypes/g' Makefile
           sed -i 's/-Werror=implicit-function-declaration/-Wno-error=implicit-function-declaration/g' Makefile
