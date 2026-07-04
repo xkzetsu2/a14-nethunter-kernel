@@ -17,7 +17,7 @@ jobs:
       - name: Setup tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq bc bison flex libssl-dev libelf-dev python3 gcc-aarch64-linux-gnu lld
+          sudo apt-get install -y -qq bc bison flex libssl-dev libelf-dev python3 gcc-aarch64-linux-gnu lld llvm
 
       - name: Create NetHunter defconfig
         run: |
@@ -32,7 +32,7 @@ jobs:
           echo "CONFIG_BT_HIDP=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
           echo "CONFIG_MAC80211_MESH=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
 
-      - name: Disable LTO & KASAN
+      - name: Disable LTO & KASAN & BTF
         run: |
           make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- exynos850-nethunter_defconfig
           scripts/config --file .config --disable LTO_NONE
@@ -42,6 +42,7 @@ jobs:
           scripts/config --file .config --disable KASAN
           scripts/config --file .config --disable KASAN_INLINE
           scripts/config --file .config --disable KASAN_STACK
+          scripts/config --file .config --disable DEBUG_INFO_BTF
 
       - name: Build kernel
         run: |
