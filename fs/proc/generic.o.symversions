@@ -1,0 +1,17 @@
+__crc_proc_symlink = 0xb55c8d8c;
+__crc__proc_mkdir = 0x37e5b2ee;
+__crc_proc_mkdir_data = 0xfdbd5626;
+__crc_proc_mkdir_mode = 0x511e686e;
+__crc_proc_mkdir = 0x071962f2;
+__crc_proc_create_mount_point = 0xde73ffe7;
+__crc_proc_create_data = 0xd5b56c36;
+__crc_proc_create = 0xf9d293f6;
+__crc_proc_create_seq_private = 0x2e774594;
+__crc_proc_create_single_data = 0x7a9cdd39;
+__crc_proc_set_size = 0x9b58ed5a;
+__crc_proc_set_user = 0x6d1fa6cd;
+__crc_remove_proc_entry = 0x3b4bfa36;
+__crc_remove_proc_subtree = 0xfca7b50d;
+__crc_proc_get_parent_data = 0x775ba05a;
+__crc_proc_remove = 0xe9c214e2;
+__crc_PDE_DATA = 0xb70c2d59;

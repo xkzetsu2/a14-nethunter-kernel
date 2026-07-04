@@ -1,0 +1,16 @@
+__crc_to_nd_region = 0x60792525;
+__crc_nd_region_dev = 0x403da8e6;
+__crc_to_nd_blk_region = 0xffef06f0;
+__crc_nd_region_provider_data = 0x72494beb;
+__crc_nd_blk_region_provider_data = 0x566c1ef1;
+__crc_nd_blk_region_set_provider_data = 0x0e141c0d;
+__crc_nd_region_to_nstype = 0x74f66910;
+__crc_nd_region_acquire_lane = 0x30cf06d5;
+__crc_nd_region_release_lane = 0x775d39f5;
+__crc_nvdimm_pmem_region_create = 0x00c1cfec;
+__crc_nvdimm_blk_region_create = 0xcdc3c299;
+__crc_nvdimm_volatile_region_create = 0xad8ef484;
+__crc_nvdimm_flush = 0xd65e3c79;
+__crc_nvdimm_has_flush = 0xcca319ca;
+__crc_nvdimm_has_cache = 0x16063d2a;
+__crc_is_nvdimm_sync = 0xb7cc151c;

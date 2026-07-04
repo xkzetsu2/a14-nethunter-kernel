@@ -1,0 +1,1 @@
+cmd_usr/include/gpu/arm/bv_r51p0/backend/gpu/mali_kbase_model_linux.h := sh ./scripts/headers_install.sh include/uapi/gpu/arm/bv_r51p0/backend/gpu/mali_kbase_model_linux.h usr/include/gpu/arm/bv_r51p0/backend/gpu/mali_kbase_model_linux.h

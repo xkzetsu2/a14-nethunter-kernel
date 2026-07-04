@@ -1,0 +1,4 @@
+__crc___f_setown = 0x5c800e73;
+__crc_f_setown = 0x90f4f729;
+__crc_fasync_helper = 0xf902526e;
+__crc_kill_fasync = 0x238b39a4;

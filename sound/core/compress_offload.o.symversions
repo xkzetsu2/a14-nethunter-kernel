@@ -1,0 +1,6 @@
+__crc_snd_compr_malloc_pages = 0x9f697911;
+__crc_snd_compr_free_pages = 0x80164bf6;
+__crc_snd_compr_stop_error = 0x3e39b1b2;
+__crc_snd_compress_new = 0x565e4f43;
+__crc_snd_compress_register = 0xfc90a8f5;
+__crc_snd_compress_deregister = 0xee06fde0;

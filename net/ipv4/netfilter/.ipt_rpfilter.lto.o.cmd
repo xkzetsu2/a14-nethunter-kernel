@@ -1,0 +1,1 @@
+cmd_net/ipv4/netfilter/ipt_rpfilter.lto.o := ld.lld -EL  -maarch64elf -z norelro --thinlto-cache-dir=.thinlto-cache -mllvm -import-instr-limit=5 -z noexecstack   -r -o net/ipv4/netfilter/ipt_rpfilter.lto.o  --whole-archive net/ipv4/netfilter/ipt_rpfilter.o

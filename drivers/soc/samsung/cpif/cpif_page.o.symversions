@@ -1,0 +1,6 @@
+__crc_cpif_page_pool_delete = 0x8081a0cc;
+__crc_cpif_page_init_tmp_page = 0xeab4b6bf;
+__crc_cpif_page_pool_create = 0xd0e4c6b2;
+__crc_cpif_get_cur_page = 0x9ecc7e75;
+__crc_cpif_cur_page_size = 0x15def732;
+__crc_cpif_page_alloc = 0xd409acaa;

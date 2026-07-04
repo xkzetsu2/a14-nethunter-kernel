@@ -1,0 +1,9 @@
+__crc_regmap_add_irq_chip_fwnode = 0x16cbc162;
+__crc_regmap_add_irq_chip = 0x8d24fb92;
+__crc_regmap_del_irq_chip = 0x131a5ed7;
+__crc_devm_regmap_add_irq_chip_fwnode = 0x60bb1a8b;
+__crc_devm_regmap_add_irq_chip = 0x40f79fdc;
+__crc_devm_regmap_del_irq_chip = 0xf3fa3705;
+__crc_regmap_irq_chip_get_base = 0x6e89a560;
+__crc_regmap_irq_get_virq = 0x55784228;
+__crc_regmap_irq_get_domain = 0x73dbd283;

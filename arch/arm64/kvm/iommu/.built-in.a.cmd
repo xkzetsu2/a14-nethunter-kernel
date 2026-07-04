@@ -1,0 +1,1 @@
+cmd_arch/arm64/kvm/iommu/built-in.a := rm -f arch/arm64/kvm/iommu/built-in.a.symversions   ; cat arch/arm64/kvm/iommu/s2mpu.o.symversions >> arch/arm64/kvm/iommu/built-in.a.symversions; rm -f arch/arm64/kvm/iommu/built-in.a; llvm-ar cDPrST arch/arm64/kvm/iommu/built-in.a arch/arm64/kvm/iommu/s2mpu.o

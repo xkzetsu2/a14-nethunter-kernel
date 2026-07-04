@@ -1,0 +1,4 @@
+__crc_em_pd_get = 0x8ae3ee98;
+__crc_em_cpu_get = 0x042c9a04;
+__crc_em_dev_register_perf_domain = 0x3d20f869;
+__crc_em_dev_unregister_perf_domain = 0x4f4ae983;

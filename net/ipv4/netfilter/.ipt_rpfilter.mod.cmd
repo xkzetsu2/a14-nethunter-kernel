@@ -1,0 +1,1 @@
+cmd_net/ipv4/netfilter/ipt_rpfilter.mod := { echo  net/ipv4/netfilter/ipt_rpfilter.o; llvm-nm net/ipv4/netfilter/ipt_rpfilter.lto.o | awk '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }'; echo; } > net/ipv4/netfilter/ipt_rpfilter.mod

@@ -1,0 +1,11 @@
+__crc_blk_ksm_init = 0x44f23167;
+__crc_devm_blk_ksm_init = 0x036e0568;
+__crc_blk_ksm_get_slot_idx = 0xe1c63523;
+__crc_blk_ksm_reprogram_all_keys = 0xe84aa640;
+__crc_blk_ksm_destroy = 0x9801f849;
+__crc_blk_ksm_register = 0x0c67de54;
+__crc_blk_ksm_derive_raw_secret = 0xc5aec680;
+__crc_blk_ksm_intersect_modes = 0x58548c86;
+__crc_blk_ksm_is_superset = 0x28c5f019;
+__crc_blk_ksm_update_capabilities = 0x593ccdff;
+__crc_blk_ksm_init_passthrough = 0x0cef0000;

@@ -1,0 +1,13 @@
+__crc_scsi_schedule_eh = 0x7e775b38;
+__crc_scsi_block_when_processing_errors = 0xb6ff1f1d;
+__crc_scsi_check_sense = 0xee9cd335;
+__crc_scsi_eh_prep_cmnd = 0xaf3a8386;
+__crc_scsi_eh_restore_cmnd = 0xc2210429;
+__crc_scsi_eh_finish_cmd = 0x8bf0dd81;
+__crc_scsi_eh_get_sense = 0x26c90ea4;
+__crc_scsi_eh_ready_devs = 0x77ade045;
+__crc_scsi_eh_flush_done_q = 0xf811e69d;
+__crc_scsi_report_bus_reset = 0x76adae1c;
+__crc_scsi_report_device_reset = 0xc90d76cf;
+__crc_scsi_command_normalize_sense = 0xd102aca4;
+__crc_scsi_get_sense_info_fld = 0xdd849d51;

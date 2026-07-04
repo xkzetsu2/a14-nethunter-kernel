@@ -1,0 +1,1 @@
+cmd_sound/soc/codecs/snd-soc-aud3004x-dump.mod := { echo  sound/soc/codecs/aud3004x-dump.o; llvm-nm sound/soc/codecs/snd-soc-aud3004x-dump.lto.o | awk '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }'; echo; } > sound/soc/codecs/snd-soc-aud3004x-dump.mod

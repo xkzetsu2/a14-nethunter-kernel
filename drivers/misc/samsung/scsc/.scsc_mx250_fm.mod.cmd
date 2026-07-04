@@ -1,0 +1,1 @@
+cmd_drivers/misc/samsung/scsc/scsc_mx250_fm.mod := { echo  drivers/misc/samsung/scsc/mx250_fm.o; llvm-nm drivers/misc/samsung/scsc/scsc_mx250_fm.lto.o | awk '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }'; echo; } > drivers/misc/samsung/scsc/scsc_mx250_fm.mod

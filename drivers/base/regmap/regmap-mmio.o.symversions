@@ -1,0 +1,4 @@
+__crc___regmap_init_mmio_clk = 0xee6ea470;
+__crc___devm_regmap_init_mmio_clk = 0x11b3a89e;
+__crc_regmap_mmio_attach_clk = 0x20dfef6a;
+__crc_regmap_mmio_detach_clk = 0x34145307;

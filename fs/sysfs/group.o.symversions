@@ -1,0 +1,13 @@
+__crc_sysfs_create_group = 0xb36277e6;
+__crc_sysfs_create_groups = 0xba3967d8;
+__crc_sysfs_update_groups = 0x4504b937;
+__crc_sysfs_update_group = 0x46cdb6b2;
+__crc_sysfs_remove_group = 0x0c3de88b;
+__crc_sysfs_remove_groups = 0xf73be5a4;
+__crc_sysfs_merge_group = 0x7c777f22;
+__crc_sysfs_unmerge_group = 0xbdea2bac;
+__crc_sysfs_add_link_to_group = 0xcd469448;
+__crc_sysfs_remove_link_from_group = 0xbedd70e2;
+__crc_compat_only_sysfs_link_entry_to_kobj = 0x8a0b545b;
+__crc_sysfs_group_change_owner = 0xc38d3e10;
+__crc_sysfs_groups_change_owner = 0x7c6c57ba;

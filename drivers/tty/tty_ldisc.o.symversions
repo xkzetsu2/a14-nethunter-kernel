@@ -1,0 +1,8 @@
+__crc_tty_register_ldisc = 0x45b53343;
+__crc_tty_unregister_ldisc = 0xa120d33c;
+__crc_tty_ldisc_ref_wait = 0x9c9c83b3;
+__crc_tty_ldisc_ref = 0xb38eed6d;
+__crc_tty_ldisc_deref = 0x173ed60f;
+__crc_tty_ldisc_flush = 0xd5d54e4c;
+__crc_tty_set_ldisc = 0x04e13a8d;
+__crc_tty_ldisc_release = 0x20c5ae8a;

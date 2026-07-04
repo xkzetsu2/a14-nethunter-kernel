@@ -1,0 +1,2 @@
+net/ipv4/netfilter/ipt_rpfilter.o
+___ratelimit __fib_lookup __rcu_read_lock __rcu_read_unlock __stack_chk_fail __this_module fib_info_nh_uses_dev fib_table_lookup printk strcmp xt_register_match xt_unregister_match

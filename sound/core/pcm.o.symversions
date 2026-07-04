@@ -1,0 +1,4 @@
+__crc_snd_pcm_format_name = 0xa286a234;
+__crc_snd_pcm_new_stream = 0xf955bc42;
+__crc_snd_pcm_new = 0xc79fae33;
+__crc_snd_pcm_new_internal = 0xc2d3a165;

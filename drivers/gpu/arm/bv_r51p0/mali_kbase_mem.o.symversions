@@ -1,0 +1,17 @@
+__crc_kbase_is_large_pages_enabled = 0x0c717d03;
+__crc_kbase_mem_term = 0xf3cfb9b0;
+__crc_kbase_gpu_mmap = 0xd244f9ca;
+__crc_kbasep_find_enclosing_cpu_mapping_offset = 0xc0baf49f;
+__crc_kbasep_find_enclosing_gpu_mapping_start_and_offset = 0x72905a84;
+__crc_kbase_sync_now = 0x15e61368;
+__crc_kbase_mem_free_region = 0x2c221c0e;
+__crc_kbase_mem_free = 0xe6421a36;
+__crc_kbase_alloc_phy_pages_helper = 0x915fe920;
+__crc_kbase_free_phy_pages_helper = 0xd621e20c;
+__crc_kbase_free_phy_pages_helper_locked = 0xff6772ec;
+__crc_kbase_mem_kref_free = 0xcce0ab6d;
+__crc_kbase_alloc_phy_pages = 0xa3db18d2;
+__crc_kbase_gpu_vm_lock = 0xe147d14a;
+__crc_kbase_gpu_vm_unlock = 0x8c6764d6;
+__crc_kbase_jit_allocate = 0xa864ac7c;
+__crc_kbase_jit_free = 0x31c3d512;

@@ -1,0 +1,1 @@
+cmd_/home/arch/langsdorff_kernel/tools/bpf/resolve_btfids/fixdep-in.o :=  ld.lld -r -o /home/arch/langsdorff_kernel/tools/bpf/resolve_btfids/fixdep-in.o  /home/arch/langsdorff_kernel/tools/bpf/resolve_btfids/fixdep.o

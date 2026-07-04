@@ -1,0 +1,9 @@
+__crc_trace_define_field = 0x03dd9b30;
+__crc_trace_event_raw_init = 0xf976b99a;
+__crc_trace_event_ignore_this_pid = 0x537ea831;
+__crc_trace_event_buffer_reserve = 0x59bc1d66;
+__crc_trace_event_reg = 0x812f87af;
+__crc_trace_set_clr_event = 0xd217e9e6;
+__crc_trace_array_set_clr_event = 0x6d7b5a8c;
+__crc_trace_get_event_file = 0xa48fdab4;
+__crc_trace_put_event_file = 0x7a924938;

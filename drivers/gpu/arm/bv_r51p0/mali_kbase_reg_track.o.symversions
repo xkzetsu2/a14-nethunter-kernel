@@ -1,0 +1,13 @@
+__crc_kbase_bits_to_zone = 0x209f8e88;
+__crc_kbase_reg_zone_get_name = 0x446d08e5;
+__crc_kbase_ctx_reg_zone_get = 0xb36a33b7;
+__crc_kbase_region_tracker_find_region_enclosing_address = 0xee5338d2;
+__crc_kbase_region_tracker_find_region_base_address = 0x21614cec;
+__crc_kbase_remove_va_region = 0x6be1c868;
+__crc_kbase_add_va_region = 0xc7e19727;
+__crc_kbase_has_exec_va_zone = 0x8a19670b;
+__crc_kbase_region_tracker_init_jit = 0x2ab27954;
+__crc_kbase_region_tracker_init_exec = 0xd328ec08;
+__crc_kbase_alloc_free_region = 0xe38620f8;
+__crc_kbase_ctx_alloc_free_region = 0x4412bae9;
+__crc_kbase_free_alloced_region = 0xbbfe17a1;

@@ -1,0 +1,2 @@
+drivers/soc/samsung/usi_v2.o
+__log_write_mmio __platform_driver_register __stack_chk_fail __this_module __tracepoint_rwmmio_write _dev_err _dev_info devm_ioremap_resource devm_kmalloc of_alias_get_id of_get_property of_property_read_string platform_driver_unregister platform_get_resource printk strncmp

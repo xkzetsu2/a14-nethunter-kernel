@@ -1,0 +1,2 @@
+__crc_drm_irq_install = 0x03df0e81;
+__crc_drm_irq_uninstall = 0x716aabe4;

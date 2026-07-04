@@ -1,0 +1,30 @@
+!<thin>
+//                                              244       `
+irqchip.o/
+irq-sun4i.o/
+irq-sunxi-nmi.o/
+irq-gic.o/
+irq-gic-common.o/
+irq-gic-v2m.o/
+irq-gic-v3.o/
+irq-gic-v3-mbi.o/
+irq-gic-v3-its.o/
+irq-gic-v3-its-platform-msi.o/
+irq-gic-v4.o/
+irq-gic-v3-its-pci-msi.o/
+irq-partition-percpu.o/
+irq-mbigen.o/
+/0              0           0     0     644     146508    `
+/11             0           0     0     644     167456    `
+/24             0           0     0     644     165248    `
+/41             0           0     0     644     284724    `
+/52             0           0     0     644     74556     `
+/70             0           0     0     644     184696    `
+/85             0           0     0     644     340848    `
+/99             0           0     0     644     188744    `
+/117            0           0     0     644     609656    `
+/135            0           0     0     644     102284    `
+/166            0           0     0     644     104392    `
+/180            0           0     0     644     164308    `
+/206            0           0     0     644     177404    `
+/230            0           0     0     644     171352    `

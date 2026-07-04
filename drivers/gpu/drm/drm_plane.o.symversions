@@ -1,0 +1,7 @@
+__crc_drm_universal_plane_init = 0x2ec397c7;
+__crc_drm_plane_init = 0x0e118b15;
+__crc_drm_plane_cleanup = 0x46b660d9;
+__crc_drm_plane_from_index = 0x48fbddc4;
+__crc_drm_plane_force_disable = 0xa792b2b7;
+__crc_drm_mode_plane_set_obj_prop = 0xc44b76b0;
+__crc_drm_any_plane_has_format = 0x2e3b8658;

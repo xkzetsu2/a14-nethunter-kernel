@@ -1,0 +1,1 @@
+cmd_drivers/net/ppp/ppp_async.mod := { echo  drivers/net/ppp/ppp_async.o; llvm-nm drivers/net/ppp/ppp_async.lto.o | awk '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }'; echo; } > drivers/net/ppp/ppp_async.mod

@@ -1,0 +1,2 @@
+drivers/net/ppp/bsd_comp.o
+__this_module kfree kmalloc_caches kmem_cache_alloc_trace ppp_register_compressor ppp_unregister_compressor printk vfree vmalloc

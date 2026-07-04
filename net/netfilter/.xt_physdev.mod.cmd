@@ -1,0 +1,1 @@
+cmd_net/netfilter/xt_physdev.mod := { echo  net/netfilter/xt_physdev.o; llvm-nm net/netfilter/xt_physdev.lto.o | awk '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }'; echo; } > net/netfilter/xt_physdev.mod

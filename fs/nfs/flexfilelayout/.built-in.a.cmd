@@ -1,0 +1,1 @@
+cmd_fs/nfs/flexfilelayout/built-in.a := rm -f fs/nfs/flexfilelayout/built-in.a.symversions    ; rm -f fs/nfs/flexfilelayout/built-in.a; llvm-ar cDPrST fs/nfs/flexfilelayout/built-in.a fs/nfs/flexfilelayout/flexfilelayout.o fs/nfs/flexfilelayout/flexfilelayoutdev.o

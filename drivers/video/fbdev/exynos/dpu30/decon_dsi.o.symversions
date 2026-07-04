@@ -1,0 +1,4 @@
+__crc_decon_set_par = 0x1c8f7431;
+__crc_decon_setcolreg = 0xaca7d4c9;
+__crc_decon_pan_display = 0x1b79e7e2;
+__crc_decon_mmap = 0xc06796c5;

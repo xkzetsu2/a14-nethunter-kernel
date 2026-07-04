@@ -1,0 +1,4 @@
+__crc_scsc_mif_abs_register = 0x894cfc81;
+__crc_scsc_mif_abs_unregister = 0x0f273fcb;
+__crc_scsc_mif_mmap_register = 0x78a4687d;
+__crc_scsc_mif_mmap_unregister = 0xba316a16;

@@ -1,0 +1,1 @@
+cmd_net/bluetooth/hidp/hidp.lto.o := ld.lld -EL  -maarch64elf -z norelro --thinlto-cache-dir=.thinlto-cache -mllvm -import-instr-limit=5 -z noexecstack   -r -o net/bluetooth/hidp/hidp.lto.o -T net/bluetooth/hidp/hidp.o.symversions --whole-archive net/bluetooth/hidp/hidp.o

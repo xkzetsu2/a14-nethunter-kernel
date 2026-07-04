@@ -1,0 +1,1 @@
+cmd_sound/soc/codecs/aw882xx/snd-soc-smartpa-aw882xx.lto.o := ld.lld -EL  -maarch64elf -z norelro --thinlto-cache-dir=.thinlto-cache -mllvm -import-instr-limit=5 -z noexecstack   -r -o sound/soc/codecs/aw882xx/snd-soc-smartpa-aw882xx.lto.o  --whole-archive sound/soc/codecs/aw882xx/snd-soc-smartpa-aw882xx.o

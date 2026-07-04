@@ -1,0 +1,2 @@
+drivers/net/ppp/ppp_deflate.o
+__stack_chk_fail __this_module kfree kmalloc_caches kmem_cache_alloc_trace ppp_register_compressor ppp_unregister_compressor printk vfree vmalloc zlib_deflate zlib_deflateEnd zlib_deflateInit2 zlib_deflateReset zlib_deflate_workspacesize zlib_inflate zlib_inflateEnd zlib_inflateIncomp zlib_inflateInit2 zlib_inflateReset zlib_inflate_workspacesize

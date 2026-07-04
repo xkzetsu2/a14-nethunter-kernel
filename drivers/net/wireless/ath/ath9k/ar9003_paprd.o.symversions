@@ -1,0 +1,7 @@
+__crc_ar9003_paprd_enable = 0xd369e281;
+__crc_ar9003_paprd_populate_single_table = 0x497d574a;
+__crc_ar9003_paprd_setup_gain_table = 0xe635a5b2;
+__crc_ar9003_paprd_create_curve = 0x9bc231e9;
+__crc_ar9003_paprd_init_table = 0x7ea2248a;
+__crc_ar9003_paprd_is_done = 0x1f24652f;
+__crc_ar9003_is_paprd_enabled = 0xfab7fbec;

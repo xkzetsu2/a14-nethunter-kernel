@@ -1,0 +1,10 @@
+!<thin>
+//                                              86        `
+qcom/smem_state.o/
+samsung/pm_domains.o/
+samsung/exynos-chipid.o/
+sunxi/sunxi_sram.o/
+/0              0           0     0     644     156080    `
+/19             0           0     0     644     98072     `
+/41             0           0     0     644     85748     `
+/66             0           0     0     644     167836    `

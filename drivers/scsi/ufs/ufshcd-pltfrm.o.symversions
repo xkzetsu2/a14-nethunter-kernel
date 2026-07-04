@@ -1,0 +1,4 @@
+__crc_ufshcd_pltfrm_shutdown = 0xb166967f;
+__crc_ufshcd_get_pwr_dev_param = 0xff85cd6b;
+__crc_ufshcd_init_pwr_dev_param = 0x54c946de;
+__crc_ufshcd_pltfrm_init = 0x282e32d0;

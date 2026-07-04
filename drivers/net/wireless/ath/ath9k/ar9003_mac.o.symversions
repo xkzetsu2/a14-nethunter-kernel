@@ -1,0 +1,4 @@
+__crc_ath9k_hw_set_rx_bufsize = 0x4aefdded;
+__crc_ath9k_hw_addrxbuf_edma = 0xcf80e423;
+__crc_ath9k_hw_process_rxdesc_edma = 0xbfbb71a1;
+__crc_ath9k_hw_setup_statusring = 0xd2c260f5;

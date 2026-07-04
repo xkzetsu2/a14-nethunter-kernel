@@ -1,0 +1,4 @@
+__crc_PageMovable = 0x956d3d04;
+__crc___SetPageMovable = 0xb38a2d8e;
+__crc___ClearPageMovable = 0xc7f4b252;
+__crc_isolate_and_split_free_page = 0x93ff12ca;

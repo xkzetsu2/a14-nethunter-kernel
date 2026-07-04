@@ -1,0 +1,2 @@
+sound/soc/samsung/abox/abox_synchronized_ipc.o
+__platform_driver_register __stack_chk_fail __this_module __wake_up _dev_err abox_iova_to_virt abox_register_ipc_handler abox_request_ipc devm_kmalloc finish_wait init_wait_entry ktime_get_real_ts64 memcpy memset of_find_device_by_node of_parse_phandle platform_driver_unregister prepare_to_wait_event printk schedule_timeout

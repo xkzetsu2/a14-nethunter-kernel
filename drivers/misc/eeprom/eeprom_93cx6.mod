@@ -1,0 +1,2 @@
+drivers/misc/eeprom/eeprom_93cx6.o
+__cfi_slowpath __const_udelay __stack_chk_fail printk usleep_range

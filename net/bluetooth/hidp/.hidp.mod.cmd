@@ -1,0 +1,1 @@
+cmd_net/bluetooth/hidp/hidp.mod := { echo  net/bluetooth/hidp/core.o net/bluetooth/hidp/sock.o; llvm-nm net/bluetooth/hidp/hidp.lto.o | awk '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }'; echo; } > net/bluetooth/hidp/hidp.mod

@@ -1,0 +1,1 @@
+cmd_sound/soc/codecs/snd-soc-aud3004x-dump.o := rm -f sound/soc/codecs/snd-soc-aud3004x-dump.o.symversions  ; rm -f sound/soc/codecs/snd-soc-aud3004x-dump.o; llvm-ar cDPrsT sound/soc/codecs/snd-soc-aud3004x-dump.o sound/soc/codecs/aud3004x-dump.o

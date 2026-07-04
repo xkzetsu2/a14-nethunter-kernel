@@ -1,0 +1,2 @@
+__crc_register_lcd_status_notifier = 0x438bc14a;
+__crc_unregister_lcd_status_notifier = 0xd2a07aaf;

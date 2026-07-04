@@ -1,0 +1,1 @@
+cmd_drivers/net/ppp/bsd_comp.mod := { echo  drivers/net/ppp/bsd_comp.o; llvm-nm drivers/net/ppp/bsd_comp.lto.o | awk '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }'; echo; } > drivers/net/ppp/bsd_comp.mod

@@ -1,0 +1,5 @@
+__crc_ath9k_cmn_debug_modal_eeprom = 0xfd2b7c8b;
+__crc_ath9k_cmn_debug_base_eeprom = 0x19bf0517;
+__crc_ath9k_cmn_debug_stat_rx = 0xb76fccc7;
+__crc_ath9k_cmn_debug_recv = 0x4e1ba65c;
+__crc_ath9k_cmn_debug_phy_err = 0xa2ca2583;

@@ -1,0 +1,3 @@
+__crc_exynos_acpm_set_rate = 0xface04b5;
+__crc_exynos_acpm_set_init_freq = 0xb4ca9a9a;
+__crc_exynos_acpm_set_device = 0xc36cb388;

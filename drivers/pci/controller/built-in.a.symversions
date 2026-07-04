@@ -1,0 +1,15 @@
+__crc_dw_pcie_find_capability = 0xb5ce4d57;
+__crc_dw_pcie_find_ext_capability = 0x8acf827e;
+__crc_dw_pcie_read = 0x7791e066;
+__crc_dw_pcie_write = 0xbe9a83d5;
+__crc_dw_pcie_read_dbi = 0x053e3341;
+__crc_dw_pcie_write_dbi = 0x5c2826ec;
+__crc_dw_pcie_wait_for_link = 0xb01e7103;
+__crc_dw_pcie_link_up = 0xe8423315;
+__crc_dw_pcie_upconfig_setup = 0x24b9f59e;
+__crc_dw_handle_msi_irq = 0x34e4b27b;
+__crc_dw_pcie_msi_init = 0xcd4cb15d;
+__crc_dw_pcie_host_init = 0xcf81718f;
+__crc_dw_pcie_host_deinit = 0x8133214b;
+__crc_dw_pcie_own_conf_map_bus = 0x581ec912;
+__crc_dw_pcie_setup_rc = 0xa31888b7;

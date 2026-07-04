@@ -1,0 +1,2 @@
+sound/soc/samsung/sec_audio_sysfs.o
+__cfi_slowpath __class_create __platform_driver_register __stack_chk_fail __this_module _dev_err _dev_info class_destroy device_create device_destroy kfree kmalloc_caches kmem_cache_alloc_trace kstrtoint of_find_property of_property_read_variable_u32_array platform_driver_unregister printk snprintf sysfs_create_group sysfs_remove_group

@@ -1,0 +1,6 @@
+__crc_pkvm_iommu_suspend = 0x6388c425;
+__crc_pkvm_iommu_resume = 0xeb7e0408;
+__crc_pkvm_iommu_finalize = 0x23d83c25;
+__crc_nvhe_hyp_panic_handler = 0x93eb9cae;
+__crc_pkvm_iommu_s2mpu_register = 0x1e1fca15;
+__crc_pkvm_iommu_sysmmu_sync_register = 0xa701419b;

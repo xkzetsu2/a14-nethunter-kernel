@@ -1,0 +1,10 @@
+__crc_drm_gem_fb_get_obj = 0x65d7ec4c;
+__crc_drm_gem_fb_destroy = 0x67c34b2c;
+__crc_drm_gem_fb_create_handle = 0x37797310;
+__crc_drm_gem_fb_init_with_funcs = 0xc7886bcd;
+__crc_drm_gem_fb_create_with_funcs = 0xeb5d07f5;
+__crc_drm_gem_fb_create = 0xed1881c7;
+__crc_drm_gem_fb_create_with_dirty = 0xac832cac;
+__crc_drm_gem_fb_afbc_init = 0x472d54e0;
+__crc_drm_gem_fb_prepare_fb = 0x4ec8033f;
+__crc_drm_gem_fb_simple_display_pipe_prepare_fb = 0xe5188342;

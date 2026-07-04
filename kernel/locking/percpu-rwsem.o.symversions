@@ -1,0 +1,5 @@
+__crc___percpu_init_rwsem = 0xf4105a2b;
+__crc_percpu_free_rwsem = 0x444e46dd;
+__crc___percpu_down_read = 0x62b54fa9;
+__crc_percpu_down_write = 0xd9ee3def;
+__crc_percpu_up_write = 0x34d31d47;

@@ -1,0 +1,5 @@
+__crc_kbase_reg_read32 = 0x14cd604c;
+__crc_kbase_reg_read64 = 0xbe8d4b6d;
+__crc_kbase_reg_read64_coherent = 0x7bbd9758;
+__crc_kbase_reg_write32 = 0xfd7b1ad7;
+__crc_kbase_reg_write64 = 0x19c91d43;

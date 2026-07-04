@@ -1,0 +1,11 @@
+__crc_ath9k_hw_init_btcoex_hw = 0xa3bdedc5;
+__crc_ath9k_hw_btcoex_init_scheme = 0x4963a68d;
+__crc_ath9k_hw_btcoex_init_2wire = 0xa1b7991f;
+__crc_ath9k_hw_btcoex_init_3wire = 0xcaa214e6;
+__crc_ath9k_hw_btcoex_deinit = 0x3b74186c;
+__crc_ath9k_hw_btcoex_init_mci = 0x2712e05c;
+__crc_ath9k_hw_btcoex_set_weight = 0x83967a85;
+__crc_ath9k_hw_btcoex_enable = 0x115f5053;
+__crc_ath9k_hw_btcoex_disable = 0xd873f780;
+__crc_ath9k_hw_btcoex_bt_stomp = 0xf7529beb;
+__crc_ath9k_hw_btcoex_set_concur_txprio = 0xf1a1df74;

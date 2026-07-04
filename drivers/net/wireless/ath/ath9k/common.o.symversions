@@ -1,0 +1,9 @@
+__crc_ath9k_cmn_rx_accept = 0xb22d51e9;
+__crc_ath9k_cmn_rx_skb_postprocess = 0xc637e274;
+__crc_ath9k_cmn_process_rate = 0xf3eff3e6;
+__crc_ath9k_cmn_process_rssi = 0xd46cc081;
+__crc_ath9k_cmn_get_hw_crypto_keytype = 0x3760e031;
+__crc_ath9k_cmn_get_channel = 0x2ca80189;
+__crc_ath9k_cmn_count_streams = 0xd2981357;
+__crc_ath9k_cmn_update_txpow = 0xdb1352bf;
+__crc_ath9k_cmn_init_crypto = 0x9ed32cbb;

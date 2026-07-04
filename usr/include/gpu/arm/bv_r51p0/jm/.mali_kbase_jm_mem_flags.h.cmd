@@ -1,0 +1,1 @@
+cmd_usr/include/gpu/arm/bv_r51p0/jm/mali_kbase_jm_mem_flags.h := sh ./scripts/headers_install.sh include/uapi/gpu/arm/bv_r51p0/jm/mali_kbase_jm_mem_flags.h usr/include/gpu/arm/bv_r51p0/jm/mali_kbase_jm_mem_flags.h

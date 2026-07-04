@@ -1,0 +1,29 @@
+!<thin>
+//                                              264       `
+pci-host-common.o/
+pci-host-generic.o/
+dwc/pcie-designware.o/
+dwc/pcie-designware-host.o/
+dwc/pcie-designware-ep.o/
+dwc/pcie-designware-plat.o/
+dwc/pcie-qcom.o/
+dwc/pcie-kirin.o/
+dwc/pcie-al.o/
+dwc/pcie-hisi.o/
+pci-thunder-ecam.o/
+pci-thunder-pem.o/
+pci-xgene.o/
+
+/0              0           0     0     644     158944    `
+/19             0           0     0     644     154920    `
+/39             0           0     0     644     241004    `
+/62             0           0     0     644     212208    `
+/90             0           0     0     644     212576    `
+/116            0           0     0     644     170744    `
+/144            0           0     0     644     348700    `
+/161            0           0     0     644     198636    `
+/179            0           0     0     644     2456      `
+/194            0           0     0     644     2464      `
+/211            0           0     0     644     2468      `
+/231            0           0     0     644     2468      `
+/250            0           0     0     644     2452      `

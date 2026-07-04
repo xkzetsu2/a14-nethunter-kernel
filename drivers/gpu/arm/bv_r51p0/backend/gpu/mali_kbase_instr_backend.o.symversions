@@ -1,0 +1,5 @@
+__crc_kbase_instr_hwcnt_request_dump = 0x99b90630;
+__crc_kbase_instr_hwcnt_dump_complete = 0xf50f9988;
+__crc_kbase_instr_hwcnt_clear = 0x6e601a8f;
+__crc_kbase_instr_hwcnt_on_unrecoverable_error = 0x09de76f3;
+__crc_kbase_instr_hwcnt_on_before_reset = 0x33fb4591;

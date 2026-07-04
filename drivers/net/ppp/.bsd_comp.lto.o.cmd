@@ -1,0 +1,1 @@
+cmd_drivers/net/ppp/bsd_comp.lto.o := ld.lld -EL  -maarch64elf -z norelro --thinlto-cache-dir=.thinlto-cache -mllvm -import-instr-limit=5 -z noexecstack   -r -o drivers/net/ppp/bsd_comp.lto.o  --whole-archive drivers/net/ppp/bsd_comp.o

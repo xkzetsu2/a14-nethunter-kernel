@@ -1,0 +1,1 @@
+cmd_drivers/misc/samsung/scsc/scsc_dbg_sampler.o := rm -f drivers/misc/samsung/scsc/scsc_dbg_sampler.o.symversions  ; rm -f drivers/misc/samsung/scsc/scsc_dbg_sampler.o; llvm-ar cDPrsT drivers/misc/samsung/scsc/scsc_dbg_sampler.o drivers/misc/samsung/scsc/mx_dbg_sampler.o

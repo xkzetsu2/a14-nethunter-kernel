@@ -1,0 +1,4 @@
+__crc_iommu_device_sysfs_add = 0x8d6e35cb;
+__crc_iommu_device_sysfs_remove = 0xff750b05;
+__crc_iommu_device_link = 0xf1a8cbc9;
+__crc_iommu_device_unlink = 0x56ef0e32;

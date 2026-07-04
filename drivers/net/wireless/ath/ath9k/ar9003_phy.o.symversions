@@ -1,0 +1,3 @@
+__crc_ar9003_hw_bb_watchdog_check = 0x0ad13862;
+__crc_ar9003_hw_bb_watchdog_dbg_info = 0xecccb28b;
+__crc_ar9003_hw_disable_phy_restart = 0x37d5204f;

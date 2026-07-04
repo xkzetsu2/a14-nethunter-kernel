@@ -1,0 +1,8 @@
+__crc___cap_empty_set = 0xbf9bcc8d;
+__crc_has_capability = 0x99358f86;
+__crc_ns_capable = 0xf3adccc5;
+__crc_ns_capable_noaudit = 0x682e9157;
+__crc_ns_capable_setid = 0x85647b75;
+__crc_capable = 0xc6cbbc89;
+__crc_file_ns_capable = 0x83b2a5ac;
+__crc_capable_wrt_inode_uidgid = 0x79a4437b;

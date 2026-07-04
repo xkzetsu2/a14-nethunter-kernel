@@ -1,0 +1,1 @@
+cmd_sound/soc/codecs/modules.order := {   echo sound/soc/codecs/snd-soc-aud3004x-5p.ko;   echo sound/soc/codecs/snd-soc-aud3004x-dump.ko;   cat sound/soc/codecs/aw882xx/modules.order; :; } | awk '!x[$$0]++' - > sound/soc/codecs/modules.order

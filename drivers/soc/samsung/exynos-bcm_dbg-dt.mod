@@ -1,0 +1,2 @@
+drivers/soc/samsung/exynos-bcm_dbg-dt.o
+__kmalloc __stack_chk_fail kfree kmalloc_caches kmem_cache_alloc_trace of_get_property of_property_count_elems_of_size of_property_read_string_helper of_property_read_u32_index of_property_read_variable_u32_array printk

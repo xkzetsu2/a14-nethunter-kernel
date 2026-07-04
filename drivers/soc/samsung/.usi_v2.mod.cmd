@@ -1,0 +1,1 @@
+cmd_drivers/soc/samsung/usi_v2.mod := { echo  drivers/soc/samsung/usi_v2.o; llvm-nm drivers/soc/samsung/usi_v2.lto.o | awk '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }'; echo; } > drivers/soc/samsung/usi_v2.mod

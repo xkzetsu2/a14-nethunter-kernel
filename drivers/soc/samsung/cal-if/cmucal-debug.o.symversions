@@ -1,0 +1,5 @@
+__crc_vclk_debug_clk_get_rate = 0xf28bfdd3;
+__crc_vclk_debug_clk_get_value = 0xe4bed7b4;
+__crc_vclk_debug_clk_set_value = 0x6731abd7;
+__crc_cmucal_dbg_set_cmu_top_base = 0x0e1afd47;
+__crc_vclk_debug_init = 0xfe8ac1d0;

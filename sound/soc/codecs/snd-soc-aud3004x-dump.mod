@@ -1,0 +1,2 @@
+sound/soc/codecs/aud3004x-dump.o
+__class_create __mutex_init __stack_chk_fail __this_module alloc_chrdev_region aud3004x_acpm_read_reg aud3004x_acpm_write_reg cdev_add cdev_del cdev_init class_create_file_ns class_destroy device_create device_destroy memcpy memset mutex_lock mutex_unlock printk sprintf stpcpy strcat strlen strncmp strncpy strspn unregister_chrdev_region

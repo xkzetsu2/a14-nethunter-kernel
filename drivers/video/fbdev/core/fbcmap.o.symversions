@@ -1,0 +1,6 @@
+__crc_fb_alloc_cmap = 0x07a890c8;
+__crc_fb_dealloc_cmap = 0x098b71c6;
+__crc_fb_copy_cmap = 0x1dd571e6;
+__crc_fb_set_cmap = 0x50e455cf;
+__crc_fb_default_cmap = 0xff6878cf;
+__crc_fb_invert_cmaps = 0xf195c682;

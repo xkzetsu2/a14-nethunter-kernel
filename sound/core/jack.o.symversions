@@ -1,0 +1,5 @@
+__crc_snd_jack_add_new_kctl = 0x3053ef87;
+__crc_snd_jack_new = 0x2a4e9f87;
+__crc_snd_jack_set_parent = 0xca6364d0;
+__crc_snd_jack_set_key = 0x9e29e641;
+__crc_snd_jack_report = 0xb9845ba2;

@@ -1,0 +1,9 @@
+__crc_decon_drvdata = 0xd4834fa0;
+__crc_decon_set_par = 0x1c8f7431;
+__crc_decon_setcolreg = 0xaca7d4c9;
+__crc_decon_pan_display = 0x1b79e7e2;
+__crc_decon_mmap = 0xc06796c5;
+__crc_register_lcd_status_notifier = 0x438bc14a;
+__crc_unregister_lcd_status_notifier = 0xd2a07aaf;
+__crc_dsim_drvdata = 0x37f9365a;
+__crc_panel_drvdata = 0x96dbadb8;

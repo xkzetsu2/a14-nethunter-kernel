@@ -1,0 +1,5 @@
+__crc_s2mpu12_read_reg = 0x5f54cd0e;
+__crc_s2mpu12_bulk_read = 0xc9f5e514;
+__crc_s2mpu12_write_reg = 0xf4bd24ba;
+__crc_s2mpu12_bulk_write = 0xa121565e;
+__crc_s2mpu12_update_reg = 0xa5619c60;

@@ -1,0 +1,1 @@
+cmd_drivers/soc/samsung/exynos-reboot.mod := { echo  drivers/soc/samsung/exynos-reboot.o; llvm-nm drivers/soc/samsung/exynos-reboot.lto.o | awk '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }'; echo; } > drivers/soc/samsung/exynos-reboot.mod

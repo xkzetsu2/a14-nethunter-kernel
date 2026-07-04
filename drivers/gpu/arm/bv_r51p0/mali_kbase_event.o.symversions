@@ -1,0 +1,4 @@
+__crc_kbase_event_dequeue = 0x26c9cb49;
+__crc_kbase_event_post = 0x612dd0ac;
+__crc_kbase_event_init = 0x39f9d170;
+__crc_kbase_event_cleanup = 0x6ad42f71;

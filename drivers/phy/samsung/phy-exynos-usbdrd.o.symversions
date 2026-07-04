@@ -1,0 +1,12 @@
+__crc_phycon_base_addr = 0x080d7dea;
+__crc_exynos_usbdrd_phy_tune = 0xbb1c1327;
+__crc_exynos_usbdrd_phy_conn = 0x9c8a8301;
+__crc_exynos_usbdrd_phy_vol_set = 0x03e9ea2c;
+__crc_exynos_usbdrd_dp_ilbk = 0x26a0b1c4;
+__crc_exynos_usbdrd_phy_vendor_set = 0xc723631c;
+__crc_exynos_usbdrd_phy_set = 0xbda48621;
+__crc_exynos_usbdrd_ldo_manual_control = 0x81d59531;
+__crc_exynos_usbdrd_ldo_external_control = 0x114d3d60;
+__crc_exynos_usbdrd_pipe3_enable = 0x190d7e62;
+__crc_exynos_usbdrd_pipe3_disable = 0x84ecee74;
+__crc_exynos_usbdrd_shutdown_notice = 0x978f6f27;

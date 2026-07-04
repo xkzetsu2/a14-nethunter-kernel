@@ -1,0 +1,6 @@
+__crc_regcache_sync = 0x257ca6dd;
+__crc_regcache_sync_region = 0x3d962c68;
+__crc_regcache_drop_region = 0x34375ea9;
+__crc_regcache_cache_only = 0xd7b0cf0c;
+__crc_regcache_mark_dirty = 0x58e854e1;
+__crc_regcache_cache_bypass = 0x1e372936;

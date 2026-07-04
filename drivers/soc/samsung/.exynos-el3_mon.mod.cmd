@@ -1,0 +1,1 @@
+cmd_drivers/soc/samsung/exynos-el3_mon.mod := { echo  drivers/soc/samsung/exynos-el3_mon.o; llvm-nm drivers/soc/samsung/exynos-el3_mon.lto.o | awk '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }'; echo; } > drivers/soc/samsung/exynos-el3_mon.mod

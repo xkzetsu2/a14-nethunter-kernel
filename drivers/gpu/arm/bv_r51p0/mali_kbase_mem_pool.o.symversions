@@ -1,0 +1,4 @@
+__crc_kbase_mem_pool_grow = 0x8e9ac001;
+__crc_kbase_mem_pool_set_max_size = 0xde5ca982;
+__crc_kbase_mem_pool_init = 0x342be851;
+__crc_kbase_mem_pool_term = 0xbafde4ae;

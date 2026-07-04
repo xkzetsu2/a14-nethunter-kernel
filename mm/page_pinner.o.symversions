@@ -1,0 +1,4 @@
+__crc_page_pinner_inited = 0xacfe4142;
+__crc_failure_tracking = 0x23f6655a;
+__crc___page_pinner_failure_detect = 0x461e9059;
+__crc___page_pinner_put_page = 0x998b46cc;

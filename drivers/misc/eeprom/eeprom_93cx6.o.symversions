@@ -1,0 +1,6 @@
+__crc_eeprom_93cx6_read = 0x884deb9d;
+__crc_eeprom_93cx6_multiread = 0xff7a0fdf;
+__crc_eeprom_93cx6_readb = 0xc9c6bb25;
+__crc_eeprom_93cx6_multireadb = 0x3cb83d5b;
+__crc_eeprom_93cx6_wren = 0x63d2ff63;
+__crc_eeprom_93cx6_write = 0x870b53e9;

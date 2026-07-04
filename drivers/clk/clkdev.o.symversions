@@ -1,0 +1,14 @@
+__crc_clk_get_sys = 0xec4d9e3a;
+__crc_clk_get = 0xc4e78557;
+__crc_clk_put = 0x2e1ca751;
+__crc_clkdev_add = 0xf3a4144c;
+__crc_clkdev_alloc = 0x58c048cd;
+__crc_clkdev_hw_alloc = 0x78e7c8a4;
+__crc_clkdev_create = 0xca4b535e;
+__crc_clkdev_hw_create = 0xaa4f6318;
+__crc_clk_add_alias = 0x7edde634;
+__crc_clkdev_drop = 0xae0b56a0;
+__crc_clk_register_clkdev = 0xc9822234;
+__crc_clk_hw_register_clkdev = 0xe24fb8c5;
+__crc_devm_clk_release_clkdev = 0x8a3ee16c;
+__crc_devm_clk_hw_register_clkdev = 0x3308da70;

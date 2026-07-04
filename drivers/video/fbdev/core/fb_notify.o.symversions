@@ -1,0 +1,3 @@
+__crc_fb_register_client = 0x80d68d3e;
+__crc_fb_unregister_client = 0xb12cbacb;
+__crc_fb_notifier_call_chain = 0x9fce80db;

@@ -1,0 +1,1 @@
+cmd_sound/soc/codecs/snd-soc-aud3004x-5p.mod := { echo  sound/soc/codecs/aud3004x.o sound/soc/codecs/aud3004x-5pin.o; llvm-nm sound/soc/codecs/snd-soc-aud3004x-5p.lto.o | awk '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }'; echo; } > sound/soc/codecs/snd-soc-aud3004x-5p.mod

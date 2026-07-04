@@ -1,0 +1,1 @@
+cmd_security/kzt/built-in.a := rm -f security/kzt/built-in.a.symversions      ; rm -f security/kzt/built-in.a; llvm-ar cDPrST security/kzt/built-in.a security/kzt/kzt_main.o security/kzt/kzt_ioctl.o security/kzt/kzt_offset.o

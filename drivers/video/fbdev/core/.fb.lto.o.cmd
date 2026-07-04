@@ -1,0 +1,1 @@
+cmd_drivers/video/fbdev/core/fb.lto.o := ld.lld -EL  -maarch64elf -z norelro --thinlto-cache-dir=.thinlto-cache -mllvm -import-instr-limit=5 -z noexecstack   -r -o drivers/video/fbdev/core/fb.lto.o -T drivers/video/fbdev/core/fb.o.symversions --whole-archive drivers/video/fbdev/core/fb.o

@@ -1,0 +1,5 @@
+__crc_ath9k_hw_getchan_noise = 0x93553c43;
+__crc_ath9k_hw_reset_calvalid = 0xb1aa0a21;
+__crc_ath9k_hw_loadnf = 0x9e8d651d;
+__crc_ath9k_hw_getnf = 0xeceb14b0;
+__crc_ath9k_hw_bstuck_nfcal = 0x519118e4;

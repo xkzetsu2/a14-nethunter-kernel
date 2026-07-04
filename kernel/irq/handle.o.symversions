@@ -1,0 +1,2 @@
+__crc_handle_bad_irq = 0x90f64e6f;
+__crc_no_action = 0xfbbd41ca;

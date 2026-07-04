@@ -1,0 +1,4 @@
+__crc_pelt_load_avg_max = 0x3489dd53;
+__crc____update_load_sum = 0xd667f721;
+__crc____update_load_avg = 0xc8b1b72f;
+__crc___update_load_avg_blocked_se = 0x02311b59;

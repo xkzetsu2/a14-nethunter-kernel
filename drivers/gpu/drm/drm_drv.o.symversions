@@ -1,0 +1,11 @@
+__crc_drm_put_dev = 0xfdec47d3;
+__crc_drm_dev_enter = 0x0db0f0f5;
+__crc_drm_dev_exit = 0xe8a034df;
+__crc_drm_dev_unplug = 0xc18104c4;
+__crc___devm_drm_dev_alloc = 0x9a0bc38c;
+__crc_drm_dev_alloc = 0x7f86f751;
+__crc_drm_dev_get = 0x2e1cf5c6;
+__crc_drm_dev_put = 0x2d989159;
+__crc_drm_dev_register = 0x47dc0aba;
+__crc_drm_dev_unregister = 0xc3132c26;
+__crc_drm_dev_set_unique = 0xfccdbe0d;

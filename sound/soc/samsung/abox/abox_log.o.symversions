@@ -1,0 +1,4 @@
+__crc_abox_log_flush_all = 0x1d6600cc;
+__crc_abox_log_schedule_flush_all = 0xf7b3467d;
+__crc_abox_log_drain_all = 0x020ac41c;
+__crc_abox_log_register_buffer = 0x686c9f51;

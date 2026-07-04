@@ -1,0 +1,3 @@
+__crc_drm_bridge_connector_enable_hpd = 0x13b8072f;
+__crc_drm_bridge_connector_disable_hpd = 0x907efa14;
+__crc_drm_bridge_connector_init = 0xb029f3d8;

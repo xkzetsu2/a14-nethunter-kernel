@@ -1,0 +1,8 @@
+__crc_ar9003_mci_get_interrupt = 0xe6e4af6e;
+__crc_ar9003_mci_send_message = 0xdf6692c9;
+__crc_ar9003_mci_setup = 0x9e9cf442;
+__crc_ar9003_mci_cleanup = 0xf145aebf;
+__crc_ar9003_mci_state = 0xc46b2d69;
+__crc_ar9003_mci_get_next_gpm_offset = 0x34a8d4af;
+__crc_ar9003_mci_set_bt_version = 0x222b8350;
+__crc_ar9003_mci_send_wlan_channels = 0x35af4b61;

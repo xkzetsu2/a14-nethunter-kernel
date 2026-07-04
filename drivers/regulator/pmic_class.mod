@@ -1,0 +1,2 @@
+drivers/regulator/pmic_class.o
+__class_create __this_module arm64_const_caps_ready cpu_hwcap_keys device_create device_destroy printk

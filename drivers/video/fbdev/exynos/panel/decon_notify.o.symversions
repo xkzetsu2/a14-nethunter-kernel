@@ -1,0 +1,4 @@
+__crc_decon_register_notifier = 0x7550e6d7;
+__crc_decon_unregister_notifier = 0xe96ab59d;
+__crc_decon_notifier_call_chain = 0x4d63f8fd;
+__crc_decon_simple_notifier_call_chain = 0x79e1436e;

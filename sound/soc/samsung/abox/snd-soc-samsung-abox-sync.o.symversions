@@ -1,0 +1,3 @@
+__crc_aw882xx_abox_recover_algo_packet = 0xb743d312;
+__crc_aw882xx_abox_read = 0x02e0390d;
+__crc_aw882xx_abox_write = 0xe5d682e4;

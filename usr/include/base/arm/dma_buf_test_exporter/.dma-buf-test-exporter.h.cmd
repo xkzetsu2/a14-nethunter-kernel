@@ -1,0 +1,1 @@
+cmd_usr/include/base/arm/dma_buf_test_exporter/dma-buf-test-exporter.h := sh ./scripts/headers_install.sh include/uapi/base/arm/dma_buf_test_exporter/dma-buf-test-exporter.h usr/include/base/arm/dma_buf_test_exporter/dma-buf-test-exporter.h

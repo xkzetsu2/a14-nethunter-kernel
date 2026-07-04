@@ -1,0 +1,15 @@
+__crc_blkcg_root = 0x5879b0d7;
+__crc_blkcg_root_css = 0x24a45b94;
+__crc_blkg_lookup_slowpath = 0x0a4f0ac6;
+__crc_blkcg_print_blkgs = 0x75241159;
+__crc___blkg_prfill_u64 = 0x3455d4ff;
+__crc_blkg_conf_prep = 0xe8ecec02;
+__crc_blkg_conf_finish = 0xf565aaa9;
+__crc_io_cgrp_subsys = 0x172adcab;
+__crc_blkcg_activate_policy = 0xbcfd26d0;
+__crc_blkcg_deactivate_policy = 0x2f09c17d;
+__crc_blkcg_policy_register = 0x89972688;
+__crc_blkcg_policy_unregister = 0xa87336ea;
+__crc_bio_associate_blkg_from_css = 0x96c0ef30;
+__crc_bio_associate_blkg = 0x82e77a9d;
+__crc_bio_clone_blkg_association = 0xce9b8a5c;

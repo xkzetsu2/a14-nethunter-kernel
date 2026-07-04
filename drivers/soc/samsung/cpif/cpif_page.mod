@@ -1,0 +1,2 @@
+drivers/soc/samsung/cpif/cpif_page.o
+___ratelimit __alloc_pages_nodemask __free_pages arm64_const_caps_ready cpu_hwcap_keys kvfree kvmalloc_node printk

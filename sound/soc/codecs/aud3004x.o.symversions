@@ -1,0 +1,7 @@
+__crc_aud3004x_acpm_read_reg = 0x0a1a48c0;
+__crc_aud3004x_acpm_write_reg = 0x8ea9685d;
+__crc_aud3004x_acpm_update_reg = 0xecaae025;
+__crc_aud3004x_read = 0xb2bf23e7;
+__crc_aud3004x_write = 0x369f72e0;
+__crc_aud3004x_update_bits = 0x6016a7b4;
+__crc_read_from_cache = 0xab3a70f2;

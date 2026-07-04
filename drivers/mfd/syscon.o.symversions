@@ -1,0 +1,5 @@
+__crc_device_node_to_regmap = 0x2892adf1;
+__crc_syscon_node_to_regmap = 0xf69392b6;
+__crc_syscon_regmap_lookup_by_compatible = 0xee6b71c4;
+__crc_syscon_regmap_lookup_by_phandle = 0xfb67639b;
+__crc_syscon_regmap_lookup_by_phandle_args = 0xf39e53f8;

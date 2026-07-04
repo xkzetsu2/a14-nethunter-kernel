@@ -1,0 +1,1 @@
+cmd_sound/soc/samsung/snd-soc-exynos3830-aud3004x.lto.o := ld.lld -EL  -maarch64elf -z norelro --thinlto-cache-dir=.thinlto-cache -mllvm -import-instr-limit=5 -z noexecstack   -r -o sound/soc/samsung/snd-soc-exynos3830-aud3004x.lto.o -T sound/soc/samsung/snd-soc-exynos3830-aud3004x.o.symversions --whole-archive sound/soc/samsung/snd-soc-exynos3830-aud3004x.o

@@ -1,0 +1,6 @@
+__crc_shmem_truncate_range = 0xa688c428;
+__crc_shmem_file_setup = 0x3cf91260;
+__crc_shmem_file_setup_with_mnt = 0x65fa4b23;
+__crc_shmem_read_mapping_page_gfp = 0xf37e1640;
+__crc_shmem_mark_page_lazyfree = 0xa809031d;
+__crc_reclaim_shmem_address_space = 0x4f3bc7a1;

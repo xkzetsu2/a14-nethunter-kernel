@@ -1,0 +1,30 @@
+!<thin>
+//                                              198       `
+soc-core.o/
+soc-dapm.o/
+soc-jack.o/
+soc-utils.o/
+soc-dai.o/
+soc-component.o/
+soc-pcm.o/
+soc-devres.o/
+soc-ops.o/
+soc-link.o/
+soc-card.o/
+soc-topology.o/
+soc-generic-dmaengine-pcm.o/
+soc-compress.o/
+/0              0           0     0     644     569592    `
+/12             0           0     0     644     586980    `
+/24             0           0     0     644     317348    `
+/36             0           0     0     644     202920    `
+/49             0           0     0     644     236960    `
+/60             0           0     0     644     274512    `
+/77             0           0     0     644     344068    `
+/88             0           0     0     644     219900    `
+/102            0           0     0     644     257196    `
+/113            0           0     0     644     194840    `
+/125            0           0     0     644     203236    `
+/137            0           0     0     644     336736    `
+/153            0           0     0     644     258684    `
+/182            0           0     0     644     226284    `

@@ -1,0 +1,6 @@
+__crc_clk_gate_is_enabled = 0x703421b6;
+__crc_clk_gate_ops = 0xe1429400;
+__crc___clk_hw_register_gate = 0xebaa2baa;
+__crc_clk_register_gate = 0x92295424;
+__crc_clk_unregister_gate = 0x8506baa8;
+__crc_clk_hw_unregister_gate = 0x50ae60a2;

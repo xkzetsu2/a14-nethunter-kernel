@@ -1,0 +1,15 @@
+__crc_devm_gpiod_get = 0x0374ba21;
+__crc_devm_gpiod_get_optional = 0x34bbb535;
+__crc_devm_gpiod_get_index = 0x2425e3f2;
+__crc_devm_gpiod_get_from_of_node = 0xfe113315;
+__crc_devm_fwnode_gpiod_get_index = 0xa44bb04a;
+__crc_devm_gpiod_get_index_optional = 0x98ba09a9;
+__crc_devm_gpiod_get_array = 0xaa961490;
+__crc_devm_gpiod_get_array_optional = 0x7e4f634d;
+__crc_devm_gpiod_put = 0xc3acb2bc;
+__crc_devm_gpiod_unhinge = 0x5a250865;
+__crc_devm_gpiod_put_array = 0xcf2c705c;
+__crc_devm_gpio_request = 0xdcf54a6d;
+__crc_devm_gpio_request_one = 0xeedcbcc2;
+__crc_devm_gpio_free = 0x4bf88931;
+__crc_devm_gpiochip_add_data_with_key = 0xa5317169;

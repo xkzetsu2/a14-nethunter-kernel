@@ -1,0 +1,2 @@
+__crc_pkvm_iommu_s2mpu_register = 0x1e1fca15;
+__crc_pkvm_iommu_sysmmu_sync_register = 0xa701419b;

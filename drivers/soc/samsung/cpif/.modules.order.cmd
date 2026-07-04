@@ -1,0 +1,1 @@
+cmd_drivers/soc/samsung/cpif/modules.order := {   echo drivers/soc/samsung/cpif/mcu_ipc.ko;   echo drivers/soc/samsung/cpif/shm_ipc.ko;   echo drivers/soc/samsung/cpif/cpif_page.ko;   echo drivers/soc/samsung/cpif/cpif.ko; :; } | awk '!x[$$0]++' - > drivers/soc/samsung/cpif/modules.order

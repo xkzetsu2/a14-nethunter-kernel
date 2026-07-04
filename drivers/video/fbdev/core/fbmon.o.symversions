@@ -1,0 +1,6 @@
+__crc_fb_firmware_edid = 0x4daf6bce;
+__crc_fb_parse_edid = 0x4351577a;
+__crc_fb_edid_to_monspecs = 0x0397edd5;
+__crc_fb_get_mode = 0xfb6ea305;
+__crc_fb_validate_mode = 0xeb2e2ee7;
+__crc_fb_destroy_modedb = 0xc07b0863;

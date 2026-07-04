@@ -1,0 +1,123 @@
+!<thin>
+//                                              982       `
+sound_core.o/
+core/sound.o/
+core/init.o/
+core/memory.o/
+core/control.o/
+core/misc.o/
+core/device.o/
+core/info.o/
+core/vmaster.o/
+core/ctljack.o/
+core/jack.o/
+core/hwdep.o/
+core/timer.o/
+core/hrtimer.o/
+core/pcm.o/
+core/pcm_native.o/
+core/pcm_lib.o/
+core/pcm_misc.o/
+core/pcm_memory.o/
+core/memalloc.o/
+core/pcm_timer.o/
+core/pcm_drm_eld.o/
+core/pcm_iec958.o/
+core/pcm_dmaengine.o/
+core/rawmidi.o/
+core/compress_offload.o/
+usb/card.o/
+usb/clock.o/
+usb/endpoint.o/
+usb/format.o/
+usb/helper.o/
+usb/mixer.o/
+usb/mixer_quirks.o/
+usb/mixer_scarlett.o/
+usb/mixer_scarlett_gen2.o/
+usb/mixer_us16x08.o/
+usb/mixer_s1810c.o/
+usb/pcm.o/
+usb/power.o/
+usb/proc.o/
+usb/quirks.o/
+usb/stream.o/
+usb/validate.o/
+usb/media.o/
+usb/midi.o/
+soc/soc-core.o/
+soc/soc-dapm.o/
+soc/soc-jack.o/
+soc/soc-utils.o/
+soc/soc-dai.o/
+soc/soc-component.o/
+soc/soc-pcm.o/
+soc/soc-devres.o/
+soc/soc-ops.o/
+soc/soc-link.o/
+soc/soc-card.o/
+soc/soc-topology.o/
+soc/soc-generic-dmaengine-pcm.o/
+soc/soc-compress.o/
+last.o/
+
+/0              0           0     0     644     135432    `
+/14             0           0     0     644     158248    `
+/28             0           0     0     644     207804    `
+/41             0           0     0     644     78568     `
+/56             0           0     0     644     408300    `
+/72             0           0     0     644     148104    `
+/85             0           0     0     644     91540     `
+/100            0           0     0     644     204152    `
+/113            0           0     0     644     115520    `
+/129            0           0     0     644     84572     `
+/145            0           0     0     644     170796    `
+/158            0           0     0     644     256700    `
+/172            0           0     0     644     342896    `
+/186            0           0     0     644     147568    `
+/202            0           0     0     644     283192    `
+/214            0           0     0     644     736308    `
+/233            0           0     0     644     345428    `
+/249            0           0     0     644     28380     `
+/266            0           0     0     644     180516    `
+/285            0           0     0     644     140416    `
+/302            0           0     0     644     148952    `
+/320            0           0     0     644     144208    `
+/340            0           0     0     644     150992    `
+/359            0           0     0     644     202396    `
+/381            0           0     0     644     374808    `
+/397            0           0     0     644     255792    `
+/422            0           0     0     644     363828    `
+/434            0           0     0     644     181288    `
+/447            0           0     0     644     227748    `
+/463            0           0     0     644     174772    `
+/477            0           0     0     644     137976    `
+/491            0           0     0     644     363100    `
+/504            0           0     0     644     317544    `
+/524            0           0     0     644     189040    `
+/546            0           0     0     644     235532    `
+/573            0           0     0     644     201364    `
+/594            0           0     0     644     180800    `
+/614            0           0     0     644     292688    `
+/625            0           0     0     644     138848    `
+/638            0           0     0     644     180912    `
+/650            0           0     0     644     230400    `
+/664            0           0     0     644     266144    `
+/678            0           0     0     644     16292     `
+/694            0           0     0     644     188372    `
+/707            0           0     0     644     284128    `
+/719            0           0     0     644     569592    `
+/735            0           0     0     644     586980    `
+/751            0           0     0     644     317348    `
+/767            0           0     0     644     202920    `
+/784            0           0     0     644     236960    `
+/799            0           0     0     644     274512    `
+/820            0           0     0     644     344068    `
+/835            0           0     0     644     219900    `
+/853            0           0     0     644     257196    `
+/868            0           0     0     644     194840    `
+/884            0           0     0     644     203236    `
+/900            0           0     0     644     336736    `
+/920            0           0     0     644     258684    `
+/953            0           0     0     644     226284    `
+/973            0           0     0     644     77652     `

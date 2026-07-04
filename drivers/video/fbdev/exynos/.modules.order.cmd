@@ -1,0 +1,1 @@
+cmd_drivers/video/fbdev/exynos/modules.order := {   cat drivers/video/fbdev/exynos/panel/modules.order;   cat drivers/video/fbdev/exynos/dpu30/modules.order; :; } | awk '!x[$$0]++' - > drivers/video/fbdev/exynos/modules.order

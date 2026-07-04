@@ -1,0 +1,3 @@
+__crc_kbase_backend_get_gpu_time_norequest = 0xf0d64924;
+__crc_kbase_backend_get_gpu_time = 0xe37520ed;
+__crc_kbase_get_timeout_ms = 0x43493f68;

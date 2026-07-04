@@ -1,0 +1,1 @@
+cmd_sound/soc/samsung/snd-soc-exynos3830-aud3004x.mod := { echo  sound/soc/samsung/exynos3830_aud3004x.o sound/soc/samsung/exynos3830_aud3004x_sysfs_cb.o; llvm-nm sound/soc/samsung/snd-soc-exynos3830-aud3004x.lto.o | awk '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }'; echo; } > sound/soc/samsung/snd-soc-exynos3830-aud3004x.mod

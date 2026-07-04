@@ -1,0 +1,1 @@
+cmd_sound/soc/samsung/modules.order := {   echo sound/soc/samsung/snd-soc-s3c-dma.ko;   cat sound/soc/samsung/abox/modules.order;   echo sound/soc/samsung/snd-soc-exynos3830-aud3004x.ko;   echo sound/soc/samsung/sec_audio_sysfs.ko;   echo sound/soc/samsung/sec_audio_debug.ko; :; } | awk '!x[$$0]++' - > sound/soc/samsung/modules.order

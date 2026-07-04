@@ -1,0 +1,2 @@
+drivers/dma-buf/heaps/samsung/dma-buf-container.o
+__arch_copy_from_user __arch_copy_to_user __check_object_size __kmalloc __stack_chk_fail __this_module arm64_const_caps_ready cpu_hwcap_keys cpu_hwcaps dma_buf_export dma_buf_get dma_buf_put fd_install get_unused_fd_flags gic_nonsecure_priorities kfree memset misc_register printk put_unused_fd

@@ -1,0 +1,5 @@
+__crc_snd_pcm_create_iec958_consumer_default = 0x649892e8;
+__crc_snd_pcm_fill_iec958_consumer = 0x62aba51f;
+__crc_snd_pcm_fill_iec958_consumer_hw_params = 0x5c407196;
+__crc_snd_pcm_create_iec958_consumer = 0x2cbccc05;
+__crc_snd_pcm_create_iec958_consumer_hw_params = 0x11eba48e;

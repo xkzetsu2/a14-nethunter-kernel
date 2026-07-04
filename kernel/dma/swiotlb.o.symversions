@@ -1,0 +1,2 @@
+__crc_swiotlb_max_segment = 0x5b6b0329;
+__crc_is_swiotlb_active = 0x18a27404;

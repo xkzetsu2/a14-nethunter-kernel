@@ -1,0 +1,1 @@
+cmd_drivers/video/fbdev/exynos/built-in.a := rm -f drivers/video/fbdev/exynos/built-in.a.symversions ; rm -f drivers/video/fbdev/exynos/built-in.a; llvm-ar cDPrST drivers/video/fbdev/exynos/built-in.a 

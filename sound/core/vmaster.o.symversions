@@ -1,0 +1,5 @@
+__crc__snd_ctl_add_follower = 0xfaa45ec0;
+__crc_snd_ctl_make_virtual_master = 0xb85fb0b2;
+__crc_snd_ctl_add_vmaster_hook = 0x97105de1;
+__crc_snd_ctl_sync_vmaster = 0x06b8c7a1;
+__crc_snd_ctl_apply_vmaster_followers = 0x77bc3cdf;

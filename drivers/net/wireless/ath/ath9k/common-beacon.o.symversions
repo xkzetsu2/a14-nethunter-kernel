@@ -1,0 +1,3 @@
+__crc_ath9k_cmn_beacon_config_sta = 0x7b5eadca;
+__crc_ath9k_cmn_beacon_config_adhoc = 0x8f07ea60;
+__crc_ath9k_cmn_beacon_config_ap = 0x253d9254;

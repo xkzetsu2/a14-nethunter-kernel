@@ -1,0 +1,1 @@
+cmd_drivers/mfd/s2mpu12_mfd.o := rm -f drivers/mfd/s2mpu12_mfd.o.symversions   ; cat drivers/mfd/s2mpu12-core.o.symversions >> drivers/mfd/s2mpu12_mfd.o.symversions  ; rm -f drivers/mfd/s2mpu12_mfd.o; llvm-ar cDPrsT drivers/mfd/s2mpu12_mfd.o drivers/mfd/s2mpu12-core.o drivers/mfd/s2mpu12-irq.o

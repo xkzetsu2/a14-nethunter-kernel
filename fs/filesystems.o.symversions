@@ -1,0 +1,3 @@
+__crc_register_filesystem = 0xdab407c0;
+__crc_unregister_filesystem = 0xd08f199a;
+__crc_get_fs_type = 0x425b1d86;

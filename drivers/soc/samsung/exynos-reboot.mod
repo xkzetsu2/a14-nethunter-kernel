@@ -1,0 +1,2 @@
+drivers/soc/samsung/exynos-reboot.o
+__cfi_slowpath __platform_driver_register __this_module _dev_emerg _dev_err _dev_info exynos_soc_info of_device_get_match_data platform_driver_unregister platform_get_resource pm_power_off printk register_restart_handler regmap_update_bits_base regmap_write strcmp syscon_regmap_lookup_by_phandle

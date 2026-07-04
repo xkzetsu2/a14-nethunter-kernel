@@ -1,0 +1,6 @@
+__crc_mfd_cell_enable = 0x14079175;
+__crc_mfd_cell_disable = 0x52d6b678;
+__crc_mfd_add_devices = 0x4e061ce0;
+__crc_mfd_remove_devices_late = 0x16c2905d;
+__crc_mfd_remove_devices = 0xce22d3e6;
+__crc_devm_mfd_add_devices = 0x9bd5e6b2;

@@ -1,0 +1,1 @@
+cmd_drivers/misc/samsung/scsc/scsc_dbg_sampler.mod := { echo  drivers/misc/samsung/scsc/mx_dbg_sampler.o; llvm-nm drivers/misc/samsung/scsc/scsc_dbg_sampler.lto.o | awk '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }'; echo; } > drivers/misc/samsung/scsc/scsc_dbg_sampler.mod

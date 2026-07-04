@@ -1,0 +1,2 @@
+drivers/net/ppp/ppp_mppe.o
+__cfi_slowpath __kmalloc __this_module arc4_crypt arc4_setkey crypto_alloc_shash crypto_destroy_tfm crypto_has_ahash crypto_shash_final crypto_shash_update kfree kfree_sensitive kmalloc_caches kmem_cache_alloc_trace memcpy ppp_register_compressor ppp_unregister_compressor printk

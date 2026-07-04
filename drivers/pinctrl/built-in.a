@@ -1,0 +1,22 @@
+!<thin>
+//                                              180       `
+core.o/
+pinctrl-utils.o/
+pinmux.o/
+pinconf.o/
+devicetree.o/
+pinconf-generic.o/
+pinctrl-single.o/
+sunxi/pinctrl-sunxi.o/
+sunxi/pinctrl-sun50i-a100.o/
+sunxi/pinctrl-sun50i-a100-r.o/
+/0              0           0     0     644     322624    `
+/8              0           0     0     644     135024    `
+/25             0           0     0     644     189388    `
+/35             0           0     0     644     155080    `
+/46             0           0     0     644     148944    `
+/60             0           0     0     644     175000    `
+/79             0           0     0     644     256132    `
+/97             0           0     0     644     348168    `
+/120            0           0     0     644     171896    `
+/149            0           0     0     644     145148    `

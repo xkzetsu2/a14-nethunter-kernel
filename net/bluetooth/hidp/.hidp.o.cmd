@@ -1,0 +1,1 @@
+cmd_net/bluetooth/hidp/hidp.o := rm -f net/bluetooth/hidp/hidp.o.symversions   ; cat net/bluetooth/hidp/core.o.symversions >> net/bluetooth/hidp/hidp.o.symversions  ; rm -f net/bluetooth/hidp/hidp.o; llvm-ar cDPrsT net/bluetooth/hidp/hidp.o net/bluetooth/hidp/core.o net/bluetooth/hidp/sock.o

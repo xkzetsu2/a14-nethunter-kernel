@@ -1,0 +1,5 @@
+__crc_exynos_bcm_dbg_ipc_send_data = 0xe5816584;
+__crc_exynos_bcm_dbg_pd_sync = 0x86321768;
+__crc_exynos_bcm_dbg_start = 0xd57bac34;
+__crc_exynos_bcm_dbg_stop = 0x780b1b18;
+__crc_exynos_bcm_dbg_load_bin = 0xe9e1e707;

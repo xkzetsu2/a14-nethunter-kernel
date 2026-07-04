@@ -1,0 +1,2 @@
+__crc_snd_vendor_set_ops = 0x3e8300ae;
+__crc_find_snd_usb_substream = 0x76d37270;

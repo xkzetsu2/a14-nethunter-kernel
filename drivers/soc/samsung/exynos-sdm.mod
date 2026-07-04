@@ -1,0 +1,2 @@
+drivers/soc/samsung/exynos-sdm.o
+__arm_smccc_smc __stack_chk_fail atomic_notifier_chain_register dbg_snapshot_is_scratch panic_notifier_list printk

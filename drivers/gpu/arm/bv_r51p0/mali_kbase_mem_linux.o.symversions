@@ -1,0 +1,4 @@
+__crc_kbase_mem_alloc = 0x197721c7;
+__crc_kbase_context_mmap = 0x5f0ee3f0;
+__crc_kbase_vmap = 0xfad2ab4c;
+__crc_kbase_vunmap = 0x077fccc6;

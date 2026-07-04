@@ -1,0 +1,1 @@
+cmd_drivers/net/ppp/ppp_deflate.mod := { echo  drivers/net/ppp/ppp_deflate.o; llvm-nm drivers/net/ppp/ppp_deflate.lto.o | awk '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }'; echo; } > drivers/net/ppp/ppp_deflate.mod

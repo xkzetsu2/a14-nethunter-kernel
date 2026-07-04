@@ -1,0 +1,5 @@
+__crc_drm_color_ctm_s31_32_to_qm_n = 0xad4e902b;
+__crc_drm_crtc_enable_color_mgmt = 0x9ee7f143;
+__crc_drm_mode_crtc_set_gamma_size = 0xe631e029;
+__crc_drm_plane_create_color_properties = 0xbccbdcc8;
+__crc_drm_color_lut_check = 0xf3e1a6cd;

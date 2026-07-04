@@ -1,0 +1,6 @@
+__crc_scsi_bus_type = 0x8014825c;
+__crc_scsi_remove_device = 0xab8d9e4e;
+__crc_scsi_remove_target = 0xfc85f86b;
+__crc_scsi_register_driver = 0x71d9b120;
+__crc_scsi_register_interface = 0xc272acea;
+__crc_scsi_is_sdev_device = 0x95abb9d4;

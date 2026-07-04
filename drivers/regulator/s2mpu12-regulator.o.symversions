@@ -1,0 +1,2 @@
+__crc_s2mpu12_read_pwron_status = 0x69d7f555;
+__crc_main_pmic_init_debug_sysfs = 0x7b946a41;

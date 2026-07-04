@@ -1,0 +1,5 @@
+__crc_pipe_lock = 0xfcfe1110;
+__crc_pipe_unlock = 0x4ccc4877;
+__crc_generic_pipe_buf_try_steal = 0xe1fd7eda;
+__crc_generic_pipe_buf_get = 0x469dcb68;
+__crc_generic_pipe_buf_release = 0x8e6e5f18;

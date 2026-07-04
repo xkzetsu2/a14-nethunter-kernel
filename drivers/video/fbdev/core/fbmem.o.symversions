@@ -1,0 +1,17 @@
+__crc_registered_fb = 0xc361c2e9;
+__crc_num_registered_fb = 0x6c61ce70;
+__crc_fb_get_color_depth = 0x6513a3fa;
+__crc_fb_pad_aligned_buffer = 0x61ea189b;
+__crc_fb_pad_unaligned_buffer = 0x42f1b900;
+__crc_fb_get_buffer_offset = 0x4c021fb2;
+__crc_fb_prepare_logo = 0xff45ff19;
+__crc_fb_show_logo = 0x38d6afe7;
+__crc_fb_pan_display = 0x342efc10;
+__crc_fb_set_var = 0x6fda4b00;
+__crc_fb_blank = 0x8681217f;
+__crc_fb_class = 0x14cdd01d;
+__crc_remove_conflicting_framebuffers = 0xb9056bb6;
+__crc_remove_conflicting_pci_framebuffers = 0x03955e03;
+__crc_register_framebuffer = 0xbb2ad6f1;
+__crc_unregister_framebuffer = 0xf1536356;
+__crc_fb_set_suspend = 0x004dc12d;

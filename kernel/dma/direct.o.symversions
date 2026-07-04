@@ -1,0 +1,4 @@
+__crc_dma_direct_get_required_mask = 0x7bf04b13;
+__crc_dma_direct_alloc = 0xe2f5b531;
+__crc_dma_direct_free = 0x399364d2;
+__crc_dma_direct_set_offset = 0x56c7ff31;

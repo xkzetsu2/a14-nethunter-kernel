@@ -1,0 +1,7 @@
+sound/soc/samsung/snd-soc-s3c-dma.ko
+sound/soc/samsung/abox/snd-soc-samsung-abox-gic.ko
+sound/soc/samsung/abox/snd-soc-samsung-abox.ko
+sound/soc/samsung/abox/snd-soc-samsung-abox-sync.ko
+sound/soc/samsung/snd-soc-exynos3830-aud3004x.ko
+sound/soc/samsung/sec_audio_sysfs.ko
+sound/soc/samsung/sec_audio_debug.ko

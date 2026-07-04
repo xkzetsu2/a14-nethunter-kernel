@@ -1,0 +1,2 @@
+__crc_kbase_pm_wait_for_gpu_power_down = 0x88c907bb;
+__crc_kbase_hwaccess_pm_halt = 0xc5f8a6fd;

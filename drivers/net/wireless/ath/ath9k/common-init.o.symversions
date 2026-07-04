@@ -1,0 +1,3 @@
+__crc_ath9k_cmn_init_channels_rates = 0x87a8e9fe;
+__crc_ath9k_cmn_setup_ht_cap = 0x27798bd7;
+__crc_ath9k_cmn_reload_chainmask = 0x9648088e;

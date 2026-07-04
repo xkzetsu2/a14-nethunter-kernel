@@ -1,0 +1,1 @@
+cmd_drivers/misc/eeprom/eeprom_93cx6.mod := { echo  drivers/misc/eeprom/eeprom_93cx6.o; llvm-nm drivers/misc/eeprom/eeprom_93cx6.lto.o | awk '$$1 == "U" { printf("%s%s", x++ ? " " : "", $$2) }'; echo; } > drivers/misc/eeprom/eeprom_93cx6.mod

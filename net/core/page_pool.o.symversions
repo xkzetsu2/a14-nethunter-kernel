@@ -1,0 +1,6 @@
+__crc_page_pool_create = 0x02bd711c;
+__crc_page_pool_alloc_pages = 0xbe547ab1;
+__crc_page_pool_release_page = 0x8ecfb3f5;
+__crc_page_pool_put_page = 0x1347e872;
+__crc_page_pool_destroy = 0x86907abc;
+__crc_page_pool_update_nid = 0x0ddd60cf;

@@ -1,0 +1,7 @@
+__crc___tracepoint_android_vh_blk_alloc_rqs = 0x23957f60;
+__crc___traceiter_android_vh_blk_alloc_rqs = 0xfab592c3;
+__crc___SCK__tp_func_android_vh_blk_alloc_rqs = 0xca5779c3;
+__crc___tracepoint_android_vh_blk_rq_ctx_init = 0xa5491a33;
+__crc___traceiter_android_vh_blk_rq_ctx_init = 0xdd6a5653;
+__crc___SCK__tp_func_android_vh_blk_rq_ctx_init = 0xc900b9ee;
+__crc_GKI_struct_blk_mq_alloc_data = 0x0d554c38;

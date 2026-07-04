@@ -1,0 +1,2 @@
+drivers/video/fbdev/exynos/panel/mcd-panel.ko
+drivers/video/fbdev/exynos/dpu30/dpu.ko

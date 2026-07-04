@@ -1,0 +1,4 @@
+__crc_aud3004x_call_notifier = 0xf5681084;
+__crc_aud3004x_notifier_flag = 0x89995940;
+__crc_aud3004x_jack_probe = 0xe691be8e;
+__crc_aud3004x_jack_remove = 0x95d372fa;

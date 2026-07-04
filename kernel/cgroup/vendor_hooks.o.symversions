@@ -1,0 +1,16 @@
+__crc___tracepoint_android_vh_cgroup_set_task = 0x68d747fd;
+__crc___traceiter_android_vh_cgroup_set_task = 0x5c95728e;
+__crc___SCK__tp_func_android_vh_cgroup_set_task = 0x049ee420;
+__crc___tracepoint_android_rvh_cpuset_fork = 0xa0966112;
+__crc___traceiter_android_rvh_cpuset_fork = 0x801b7e5c;
+__crc___SCK__tp_func_android_rvh_cpuset_fork = 0x0135f714;
+__crc___tracepoint_android_rvh_cgroup_force_kthread_migration = 0x0c180285;
+__crc___traceiter_android_rvh_cgroup_force_kthread_migration = 0xb7877dc3;
+__crc___SCK__tp_func_android_rvh_cgroup_force_kthread_migration = 0x3d6faa04;
+__crc___tracepoint_android_rvh_refrigerator = 0xaa020dd1;
+__crc___traceiter_android_rvh_refrigerator = 0x811d8704;
+__crc___SCK__tp_func_android_rvh_refrigerator = 0x43c00b72;
+__crc___tracepoint_android_vh_cgroup_attach = 0x83be6a33;
+__crc___traceiter_android_vh_cgroup_attach = 0x8ca14e50;
+__crc___SCK__tp_func_android_vh_cgroup_attach = 0x6a7c6c90;
+__crc_GKI_struct_cgroup_taskset = 0x72d9bab0;

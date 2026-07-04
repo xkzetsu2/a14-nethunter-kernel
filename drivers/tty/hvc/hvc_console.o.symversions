@@ -1,0 +1,6 @@
+__crc_hvc_instantiate = 0xda3c6f74;
+__crc_hvc_kick = 0x9833bc0c;
+__crc_hvc_poll = 0x7e669355;
+__crc___hvc_resize = 0x626a2c75;
+__crc_hvc_alloc = 0xf479db2c;
+__crc_hvc_remove = 0xd79573d4;

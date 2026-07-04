@@ -1,0 +1,5 @@
+__crc_exynos_acpm_read_reg = 0x2790b536;
+__crc_exynos_acpm_bulk_read = 0x1d530dc1;
+__crc_exynos_acpm_write_reg = 0xea06aff8;
+__crc_exynos_acpm_bulk_write = 0xff226839;
+__crc_exynos_acpm_update_reg = 0x8f64bd1b;

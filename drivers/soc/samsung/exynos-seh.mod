@@ -1,0 +1,2 @@
+drivers/soc/samsung/exynos-seh.o
+__alloc_pages_nodemask __arm_smccc_smc __free_pages __stack_chk_fail flush_dcache_page kimage_voffset memset memstart_addr printk vabits_actual

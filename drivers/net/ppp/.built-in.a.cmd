@@ -1,0 +1,1 @@
+cmd_drivers/net/ppp/built-in.a := rm -f drivers/net/ppp/built-in.a.symversions    ; rm -f drivers/net/ppp/built-in.a; llvm-ar cDPrST drivers/net/ppp/built-in.a drivers/net/ppp/ppp_generic.o drivers/net/ppp/pppox.o

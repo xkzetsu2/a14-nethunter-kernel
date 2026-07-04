@@ -1,0 +1,14 @@
+__crc___tracepoint_task_newtask = 0x6ba3f1e6;
+__crc___traceiter_task_newtask = 0x88c9d230;
+__crc___SCK__tp_func_task_newtask = 0x8852b350;
+__crc_tasklist_lock = 0x673472ea;
+__crc_put_task_stack = 0x9d15ac07;
+__crc_free_task = 0x90c2259f;
+__crc___mmdrop = 0x1ece15de;
+__crc___put_task_struct = 0x712c5b69;
+__crc___put_task_struct_rcu_cb = 0x94160518;
+__crc_mmput = 0x1960fa32;
+__crc_mmput_async = 0xfd30c74f;
+__crc_get_mm_exe_file = 0x7fa96201;
+__crc_get_task_exe_file = 0x5ea56300;
+__crc_get_task_mm = 0xe15e0ea6;
