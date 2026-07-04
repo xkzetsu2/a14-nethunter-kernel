@@ -1,0 +1,60 @@
+name: Build NetHunter Kernel
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq bc bison flex libssl-dev libelf-dev python3
+
+      - name: Setup ARM64 toolchain
+        run: |
+          sudo apt-get install -y -qq gcc-aarch64-linux-gnu
+
+      - name: Create NetHunter defconfig
+        run: |
+          cat arch/arm64/configs/exynos850-a14nsxx_defconfig > arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_MT7601U=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_RTL8XXXU=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_RTL8XXXU_UNTESTED=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_ATH9K_HTC=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_CARL9170=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_USB_G_HID=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_NETFILTER_XT_MATCH_IPRANGE=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_BT_HIDP=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_MAC80211_MESH=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
+
+      - name: Build kernel
+        run: |
+          export ARCH=arm64
+          export CROSS_COMPILE=aarch64-linux-gnu-
+          make exynos850-nethunter_defconfig
+          make -j$(nproc) KCFLAGS="-Wno-strict-prototypes -Wno-int-conversion -Wno-implicit-int -Wno-deprecated-non-prototype"
+
+      - name: Prepare boot.img
+        run: |
+          mkdir -p output
+          cp arch/arm64/boot/Image output/
+          # Find all .ko modules
+          find . -name "*.ko" -exec cp {} output/ \;
+          # Create boot.img if mkbootimg is available
+          cat arch/arm64/boot/Image | gzip > output/Image.gz
+          ls -lh output/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nethunter-kernel-a14
+          path: output/
