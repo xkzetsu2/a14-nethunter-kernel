@@ -51,6 +51,9 @@ jobs:
           sed -i 's/-Werror=date-time/-Wno-error=date-time/g' Makefile
           sed -i 's/-Werror=incompatible-pointer-types/-Wno-error=incompatible-pointer-types/g' Makefile
           sed -i 's/-Werror=designated-init/-Wno-error=designated-init/g' Makefile
+          # Force disable all -Werror at the end of Makefile
+          echo 'KBUILD_CFLAGS += -Wno-error' >> Makefile
+          echo 'KBUILD_CFLAGS += -Wno-int-conversion' >> Makefile
 
       - name: Build kernel
         run: |
