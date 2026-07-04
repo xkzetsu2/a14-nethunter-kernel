@@ -46,7 +46,7 @@ jobs:
 
       - name: Build kernel
         run: |
-          make ARCH=arm64 CC=aarch64-linux-gnu-gcc CROSS_COMPILE=aarch64-linux-gnu- KCFLAGS="-Wno-strict-prototypes -Wno-int-conversion -Wno-implicit-int -Wno-deprecated-non-prototype -Wno-return-type" -j$(nproc)
+          make ARCH=arm64 CC=aarch64-linux-gnu-gcc CROSS_COMPILE=aarch64-linux-gnu- KCFLAGS="-Wno-error" -j$(nproc)
 
       - name: Prepare artifacts
         run: |
