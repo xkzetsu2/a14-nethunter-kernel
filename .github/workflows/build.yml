@@ -43,10 +43,18 @@ jobs:
           scripts/config --file .config --disable KASAN_INLINE
           scripts/config --file .config --disable KASAN_STACK
           scripts/config --file .config --disable DEBUG_INFO_BTF
+          # Fix Werror in Makefile (Samsung vendor code breaks with -Werror)
+          sed -i 's/-Werror=strict-prototypes/-Wno-error=strict-prototypes/g' Makefile
+          sed -i 's/-Werror=implicit-function-declaration/-Wno-error=implicit-function-declaration/g' Makefile
+          sed -i 's/-Werror=implicit-int/-Wno-error=implicit-int/g' Makefile
+          sed -i 's/-Werror=return-type/-Wno-error=return-type/g' Makefile
+          sed -i 's/-Werror=date-time/-Wno-error=date-time/g' Makefile
+          sed -i 's/-Werror=incompatible-pointer-types/-Wno-error=incompatible-pointer-types/g' Makefile
+          sed -i 's/-Werror=designated-init/-Wno-error=designated-init/g' Makefile
 
       - name: Build kernel
         run: |
-          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 KCFLAGS="-Wno-error" -j$(nproc)
+          make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 -j$(nproc)
 
       - name: Prepare artifacts
         run: |
