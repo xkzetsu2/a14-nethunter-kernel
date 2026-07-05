@@ -18,7 +18,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq bc bison flex libssl-dev libelf-dev python3 \
-            gcc-aarch64-linux-gnu mold lz4 brotli cpio xz-utils
+            gcc-aarch64-linux-gnu mold lz4 brotli cpio xz-utils dwarves
           # Ensure mold is on PATH
           which mold
 
