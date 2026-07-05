@@ -22,6 +22,10 @@ jobs:
       - name: Create NetHunter defconfig
         run: |
           cat arch/arm64/configs/exynos850-a14nsxx_defconfig > arch/arm64/configs/exynos850-nethunter_defconfig
+          # Enable vendor WiFi drivers first (before module options)
+          echo "CONFIG_WLAN_VENDOR_ATH=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_WLAN_VENDOR_REALTEK=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_WLAN_VENDOR_MEDIATEK=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
           echo "CONFIG_MT7601U=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
           echo "CONFIG_RTL8XXXU=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
           echo "CONFIG_RTL8XXXU_UNTESTED=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
