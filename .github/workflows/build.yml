@@ -45,8 +45,28 @@ jobs:
           cd /
           rm -rf /tmp/aosp-clang-repo
 
+          # Reassemble split binaries (Debian packaging splits large files)
+          echo "=== Reassembling split binaries ==="
+          find "$CLANG_DEST" -name '*.split??' -type f | sed 's/\.split[0-9][0-9]$//' | sort -u | while read base; do
+            parts=$(ls "${base}.split"?? 2>/dev/null | sort)
+            if [ -n "$parts" ]; then
+              echo "Reassembling: $base"
+              cat $parts > "$base"
+              chmod +x "$base" 2>/dev/null || true
+              rm -f ${base}.split??
+            fi
+          done
+          # clang wrapper expects clang.real -> clang-14
+          # Droidian has stub clang.real (8 bytes), replace with symlink
+          rm -f "$CLANG_DEST/bin/clang.real"
+          ln -sf clang-14 "$CLANG_DEST/bin/clang.real"
+          rm -f "$CLANG_DEST/bin/clang++.real"
+          ln -sf clang-14 "$CLANG_DEST/bin/clang++.real"
+          cd /
+
           echo "=== Final clang location ==="
           ls -la "$CLANG_DEST/bin/clang" 2>/dev/null || echo "clang not found!"
+          ls -la "$CLANG_DEST/bin/clang.real" 2>/dev/null || echo "clang.real not found!"
           echo "=== aarch64 binutils ==="
           ls "$CLANG_DEST/bin/aarch64-linux-gnu-objdump" 2>/dev/null || echo "(no aarch64 binutils in clang dir)"
           echo "=== clang version ==="
@@ -71,6 +91,7 @@ jobs:
 
       - name: Clean build tree
         run: |
+          make mrproper 2>/dev/null || true
           rm -rf out modules_out
 
       - name: Create NetHunter defconfig
