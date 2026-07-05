@@ -142,11 +142,11 @@ jobs:
 
           # Debug: check what's in the source tree
           echo "=== Source tree debug ==="
-          ls -la .config 2>&1
-          ls -la include/config/ 2>&1
-          ls -la include/generated/ 2>&1
-          ls -la arch/arm64/include/generated/ 2>&1
-          git status --short 2>&1 | head -20
+          ls -la .config 2>&1 || true
+          ls -la include/config/ 2>&1 || true
+          ls -la include/generated/ 2>&1 || true
+          ls -la arch/arm64/include/generated/ 2>&1 || true
+          git status --short 2>&1 | head -20 || true
           echo "=== End debug ==="
 
           # Configure
