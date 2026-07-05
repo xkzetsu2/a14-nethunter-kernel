@@ -20,9 +20,16 @@ jobs:
           sudo apt-get install -y -qq bc bison flex libssl-dev libelf-dev python3 gcc-aarch64-linux-gnu clang-14 lld-14 llvm-14
           # Symlink unversioned tools to clang-14
           sudo ln -sf /usr/bin/clang-14 /usr/local/bin/clang
+          sudo ln -sf /usr/bin/clang++-14 /usr/local/bin/clang++
           sudo ln -sf /usr/bin/llvm-ar-14 /usr/local/bin/llvm-ar
           sudo ln -sf /usr/bin/ld.lld-14 /usr/local/bin/ld.lld
+          sudo ln -sf /usr/bin/llvm-nm-14 /usr/local/bin/llvm-nm
           sudo ln -sf /usr/bin/llvm-objcopy-14 /usr/local/bin/llvm-objcopy
+          sudo ln -sf /usr/bin/llvm-objdump-14 /usr/local/bin/llvm-objdump
+          sudo ln -sf /usr/bin/llvm-strip-14 /usr/local/bin/llvm-strip
+          sudo ln -sf /usr/bin/llvm-readelf-14 /usr/local/bin/llvm-readelf
+          sudo ln -sf /usr/bin/llvm-size-14 /usr/local/bin/llvm-size
+          clang --version
           sudo ln -sf /usr/bin/llvm-objdump-14 /usr/local/bin/llvm-objdump
           sudo ln -sf /usr/bin/llvm-strip-14 /usr/local/bin/llvm-strip
 
