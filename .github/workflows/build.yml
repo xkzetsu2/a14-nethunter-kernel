@@ -52,6 +52,9 @@ jobs:
           scripts/config --file .config --disable KASAN_INLINE
           scripts/config --file .config --disable PCIEAER
           scripts/config --file .config --disable DEBUG_INFO_BTF
+          scripts/config --file .config --disable CFI_CLANG
+          scripts/config --file .config --disable CFI_CLANG_SHADOW
+          # Keep SHADOW_CALL_STACK - it's fine without CFI
           sed -i 's/-Werror=strict-prototypes/-Wno-error=strict-prototypes/g' Makefile
           sed -i 's/-Werror=implicit-function-declaration/-Wno-error=implicit-function-declaration/g' Makefile
           sed -i 's/-Werror=implicit-int/-Wno-error=implicit-int/g' Makefile
