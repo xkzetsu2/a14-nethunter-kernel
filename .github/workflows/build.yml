@@ -17,54 +17,63 @@ jobs:
       - name: Setup tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq bc bison flex libssl-dev libelf-dev python3 gcc-aarch64-linux-gnu clang-14 lld-14 llvm-14
-          # Symlink unversioned tools to clang-14
+          sudo apt-get install -y -qq bc bison flex libssl-dev libelf-dev python3 \
+            gcc-aarch64-linux-gnu clang-14 lld-14 llvm-14 mold lz4 brotli
           sudo ln -sf /usr/bin/clang-14 /usr/local/bin/clang
           sudo ln -sf /usr/bin/clang++-14 /usr/local/bin/clang++
           sudo ln -sf /usr/bin/llvm-ar-14 /usr/local/bin/llvm-ar
           sudo ln -sf /usr/bin/ld.lld-14 /usr/local/bin/ld.lld
           sudo ln -sf /usr/bin/llvm-nm-14 /usr/local/bin/llvm-nm
           sudo ln -sf /usr/bin/llvm-objcopy-14 /usr/local/bin/llvm-objcopy
-          sudo ln -sf /usr/bin/llvm-objdump-14 /usr/local/bin/llvm-objdump
-          sudo ln -sf /usr/bin/llvm-strip-14 /usr/local/bin/llvm-strip
-          sudo ln -sf /usr/bin/llvm-readelf-14 /usr/local/bin/llvm-readelf
-          sudo ln -sf /usr/bin/llvm-size-14 /usr/local/bin/llvm-size
-          clang --version
-          sudo ln -sf /usr/bin/llvm-objdump-14 /usr/local/bin/llvm-objdump
           sudo ln -sf /usr/bin/llvm-strip-14 /usr/local/bin/llvm-strip
 
-      - name: Configure stock kernel
+      - name: Create NetHunter defconfig
         run: |
-          make ARCH=arm64 LLVM=1 exynos850-a14nsxx_defconfig
-          # Minimo necessario para compilar com clang-14
-          scripts/config --file .config --disable KASAN
-          scripts/config --file .config --disable KASAN_INLINE
-          scripts/config --file .config --disable PCIEAER
-          scripts/config --file .config --disable DEBUG_INFO_BTF
-          # Fix Werror in Makefile (Samsung vendor code breaks with -Werror)
+          cat arch/arm64/configs/a14noavbp_defconfig > arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_WLAN_VENDOR_ATH=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_WLAN_VENDOR_REALTEK=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_WLAN_VENDOR_MEDIATEK=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_MT7601U=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_RTL8XXXU=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_RTL8XXXU_UNTESTED=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_ATH9K_HTC=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_CARL9170=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_USB_G_HID=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_BT_HIDP=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_MAC80211_MESH=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
+
+      - name: Configure kernel
+        run: |
+          make ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
+            O=out exynos850-nethunter_defconfig
+          scripts/config --file out/.config --disable KASAN
+          scripts/config --file out/.config --disable KASAN_INLINE
+          scripts/config --file out/.config --disable PCIEAER
+          scripts/config --file out/.config --disable DEBUG_INFO_BTF
           sed -i 's/-Werror=strict-prototypes/-Wno-error=strict-prototypes/g' Makefile
           sed -i 's/-Werror=implicit-function-declaration/-Wno-error=implicit-function-declaration/g' Makefile
           sed -i 's/-Werror=implicit-int/-Wno-error=implicit-int/g' Makefile
           sed -i 's/-Werror=return-type/-Wno-error=return-type/g' Makefile
-          sed -i 's/-Werror=date-time/-Wno-error=date-time/g' Makefile
-          sed -i 's/-Werror=incompatible-pointer-types/-Wno-error=incompatible-pointer-types/g' Makefile
-          sed -i 's/-Werror=designated-init/-Wno-error=designated-init/g' Makefile
-          # Force disable all -Werror at the end of Makefile
           echo 'KBUILD_CFLAGS += -Wno-error' >> Makefile
           echo 'KBUILD_CFLAGS += -Wno-int-conversion' >> Makefile
 
-      - name: Build kernel
+      - name: Build kernel (dtbs first, then kernel, then modules)
         run: |
-          make ARCH=arm64 LLVM=1 \
-            PLATFORM_VERSION=14 ANDROID_MAJOR_VERSION=u \
-            DTC_FLAGS="-@" -j$(nproc)
+          BUILD_ARGS="LOCALVERSION=-nethunter-a14-$(git rev-parse --short HEAD) KBUILD_BUILD_USER=opencode KBUILD_BUILD_HOST=ci"
+          make -j$(nproc) -C $(pwd) ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
+            LDFLAGS="-fuse-ld=mold" O=out $BUILD_ARGS dtbs
+          make -j$(nproc) -C $(pwd) ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
+            LDFLAGS="-fuse-ld=mold" O=out $BUILD_ARGS
+          make -j$(nproc) -C $(pwd) ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
+            LDFLAGS="-fuse-ld=mold" O=out INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" \
+            INSTALL_MOD_PATH=modules_out $BUILD_ARGS modules_install
 
       - name: Prepare artifacts
         run: |
           mkdir -p output
-          cp arch/arm64/boot/Image output/
-          find . -path ./output -prune -o -name "*.ko" -print -exec cp {} output/ \;
-          cat arch/arm64/boot/Image | gzip > output/Image.gz
+          cp out/arch/arm64/boot/Image output/
+          find . -path ./out -prune -o -path ./modules_out -prune -o -name "*.ko" -print -exec cp {} output/ \;
+          cp -r modules_out/lib/modules/* output/ 2>/dev/null || true
           ls -lh output/
 
       - name: Upload artifacts
