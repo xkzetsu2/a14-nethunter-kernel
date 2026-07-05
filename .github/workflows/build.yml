@@ -14,19 +14,69 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Setup tools
+      - name: Setup system tools
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq bc bison flex libssl-dev libelf-dev python3 \
-            gcc-aarch64-linux-gnu clang-14 lld-14 llvm-14 mold lz4 brotli
-          sudo ln -sf /usr/bin/clang-14 /usr/local/bin/clang
-          sudo ln -sf /usr/bin/clang++-14 /usr/local/bin/clang++
-          sudo ln -sf /usr/bin/llvm-ar-14 /usr/local/bin/llvm-ar
-          sudo ln -sf /usr/bin/ld.lld-14 /usr/local/bin/ld.lld
-          sudo ln -sf /usr/bin/llvm-nm-14 /usr/local/bin/llvm-nm
-          sudo ln -sf /usr/bin/llvm-objcopy-14 /usr/local/bin/llvm-objcopy
-          sudo ln -sf /usr/bin/llvm-objdump-14 /usr/local/bin/llvm-objdump
-          sudo ln -sf /usr/bin/llvm-strip-14 /usr/local/bin/llvm-strip
+            gcc-aarch64-linux-gnu mold lz4 brotli cpio xz-utils
+          # Ensure mold is on PATH
+          which mold
+
+      - name: Download clang-r450784d (exact langsdorff toolchain)
+        run: |
+          # Try multiple sources for clang-r450784d prebuilt
+          mkdir -p /tmp/clang_host/clang-r450784d
+
+          # Source 1: Google AOSP
+          echo "[1/3] Trying Google AOSP..."
+          if curl -L --connect-timeout 15 --max-time 120 \
+            "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r450784d.tar.gz" \
+            -o /tmp/clang.tar.gz 2>/dev/null && [ -s /tmp/clang.tar.gz ]; then
+            echo "Downloaded from AOSP!"
+            tar -xzf /tmp/clang.tar.gz -C /tmp/clang_host/clang-r450784d/ 2>/dev/null
+          fi
+
+          # Source 2: GitHub mirror (LineageOS or similar)
+          if [ ! -f /tmp/clang_host/clang-r450784d/bin/clang ]; then
+            echo "[2/3] Trying GitHub mirror..."
+            curl -L --connect-timeout 15 --max-time 120 \
+              "https://github.com/LineageOS/android_prebuilts_clang_host_linux-x86_clang-r450784d/archive/refs/heads/main.tar.gz" \
+              -o /tmp/clang.tar.gz 2>/dev/null && [ -s /tmp/clang.tar.gz ] && {
+              mkdir -p /tmp/clang_extract
+              tar -xzf /tmp/clang.tar.gz -C /tmp/clang_extract/ 2>/dev/null
+              cp -r /tmp/clang_extract/*/clang-r450784d/* /tmp/clang_host/clang-r450784d/ 2>/dev/null || true
+            }
+          fi
+
+          # Source 3: Kirisakura's prebuilt mirror
+          if [ ! -f /tmp/clang_host/clang-r450784d/bin/clang ]; then
+            echo "[3/3] Trying Kirisakura's mirror..."
+            curl -L --connect-timeout 15 --max-time 120 \
+              "https://github.com/arter97/arter97-kernel-actions/raw/clang-r450784d/clang-r450784d.tar.gz" \
+              -o /tmp/clang.tar.gz 2>/dev/null && [ -s /tmp/clang.tar.gz ] && {
+              tar -xzf /tmp/clang.tar.gz -C /tmp/clang_host/clang-r450784d/ 2>/dev/null
+            }
+          fi
+
+          # Verify
+          if [ ! -f /tmp/clang_host/clang-r450784d/bin/clang ]; then
+            echo "All sources failed for clang-r450784d."
+            echo "Falling back to system clang-14..."
+            sudo apt-get install -y -qq clang-14 lld-14 llvm-14
+            mkdir -p /tmp/clang_host/clang-r450784d/bin
+            for tool in clang clang++ ld.lld llvm-ar llvm-nm llvm-objcopy llvm-objdump llvm-strip; do
+              ln -sf $(which ${tool}-14 2>/dev/null || echo "") /tmp/clang_host/clang-r450784d/bin/${tool} 2>/dev/null || true
+            done
+          fi
+
+      - name: Verify toolchain
+        run: |
+          CLANG_DIR="/tmp/clang_host/clang-r450784d"
+          echo "=== CLANG ==="
+          $CLANG_DIR/bin/clang --version 2>&1 | head -3
+          echo "=== Available tools ==="
+          ls $CLANG_DIR/bin/aarch64-linux-gnu-* 2>/dev/null || echo "(no aarch64 binutils, using system)"
+          ls $CLANG_DIR/bin/llvm-* 2>/dev/null | head -10
 
       - name: Create NetHunter defconfig
         run: |
@@ -43,61 +93,65 @@ jobs:
           echo "CONFIG_BT_HIDP=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
           echo "CONFIG_MAC80211_MESH=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
 
-      - name: Configure kernel
+      - name: Build kernel (exact langsdorff flags)
         run: |
-          # No mrproper needed for in-tree build
-          make ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
+          CLANG_DIR="/tmp/clang_host/clang-r450784d"
+
+          # Setup - same as buildnoavbp.sh
+          export CROSS_COMPILE="${CLANG_DIR}/bin/aarch64-linux-gnu-"
+          export CC="${CLANG_DIR}/bin/clang"
+          export PATH="${CLANG_DIR}/bin:$PATH"
+          export LD="mold"
+          export LLVM=1
+          export ARCH=arm64
+          export LLVM_LDFLAGS="-fuse-ld=mold"
+          export DTC_FLAGS="-@"
+
+          # If clang-r450784d doesn't have aarch64 binutils, fallback to system
+          if ! which ${CROSS_COMPILE}as 2>/dev/null; then
+            echo "Using system aarch64-linux-gnu- for CROSS_COMPILE"
+            export CROSS_COMPILE="aarch64-linux-gnu-"
+          fi
+
+          MOD_VER=$(git rev-parse --short HEAD)
+          BUILD_ARGS="LOCALVERSION=-nethunter-a14-${MOD_VER} KBUILD_BUILD_USER=opencode KBUILD_BUILD_HOST=ci O=out"
+
+          # Configure
+          make -C . O=out ARCH=arm64 LLVM=1 CC=clang \
+            CROSS_COMPILE=${CROSS_COMPILE} \
             exynos850-nethunter_defconfig
-          scripts/config --file .config --disable KASAN
-          scripts/config --file .config --disable KASAN_INLINE
-          scripts/config --file .config --disable PCIEAER
-          scripts/config --file .config --disable DEBUG_INFO_BTF
-          scripts/config --file .config --disable CFI_CLANG
-          scripts/config --file .config --disable CFI_CLANG_SHADOW
-          # Keep SHADOW_CALL_STACK - it's fine without CFI
-          sed -i 's/-Werror=strict-prototypes/-Wno-error=strict-prototypes/g' Makefile
-          sed -i 's/-Werror=implicit-function-declaration/-Wno-error=implicit-function-declaration/g' Makefile
-          sed -i 's/-Werror=implicit-int/-Wno-error=implicit-int/g' Makefile
-          sed -i 's/-Werror=return-type/-Wno-error=return-type/g' Makefile
-          echo 'KBUILD_CFLAGS += -Wno-error' >> Makefile
-          echo 'KBUILD_CFLAGS += -Wno-int-conversion' >> Makefile
 
-      - name: Build kernel (dtbs first, then kernel, then modules)
-        run: |
-          BUILD_ARGS="LOCALVERSION=-nethunter-a14-$(git rev-parse --short HEAD) KBUILD_BUILD_USER=opencode KBUILD_BUILD_HOST=ci"
-          make -j$(nproc) ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
-            LDFLAGS="-fuse-ld=mold" $BUILD_ARGS dtbs
-          make -j$(nproc) ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
-            LDFLAGS="-fuse-ld=mold" $BUILD_ARGS
-          make -j$(nproc) ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
-            LDFLAGS="-fuse-ld=mold" INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" \
-            INSTALL_MOD_PATH=modules_out $BUILD_ARGS modules_install
+          # Check if CFI symbols exist in this clang version
+          if echo 'int main(){}' | ${CC} -fsanitize=cfi -c -x c - -o /dev/null 2>&1; then
+            echo "CFI SUPPORTED - keeping enabled"
+          else
+            echo "CFI NOT SUPPORTED - disabling"
+            scripts/config --file .config --disable CFI_CLANG
+            scripts/config --file .config --disable CFI_CLANG_SHADOW
+          fi
 
-      - name: Prepare artifacts
-        run: |
-          mkdir -p output
-          cp arch/arm64/boot/Image output/
-          find . -path ./modules_out -prune -o -name "*.ko" -print -exec cp {} output/ \;
-          cp -r modules_out/lib/modules/* output/ 2>/dev/null || true
-          ls -lh output/
+          # Build kernel (dtbs + Image + modules) - same as langsdorff
+          make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
+            CROSS_COMPILE=${CROSS_COMPILE} \
+            LDFLAGS="-fuse-ld=mold" \
+            ${BUILD_ARGS}
 
-      - name: Upload full artifacts (kernel + modules)
-        uses: actions/upload-artifact@v4
-        with:
-          name: nethunter-kernel-a14-full
-          path: output/
+          # Also build modules
+          make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
+            CROSS_COMPILE=${CROSS_COMPILE} \
+            LDFLAGS="-fuse-ld=mold" \
+            INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" \
+            INSTALL_MOD_PATH=$(pwd)/modules_out \
+            ${BUILD_ARGS} modules_install
 
-      - name: Upload kernel image only
-        uses: actions/upload-artifact@v4
-        with:
-          name: nethunter-kernel-a14-image
-          path: output/Image
+          echo "=== Build complete ==="
+          ls -lh out/arch/arm64/boot/Image
 
       - name: Create boot.img
         run: |
           python3 kernel_build/mkbootimg/mkbootimg.py \
             --header_version 4 \
-            --kernel output/Image \
+            --kernel out/arch/arm64/boot/Image \
             --output boot.img \
             --os_version 14.0.0 \
             --os_patch_level 2025-04
@@ -108,3 +162,17 @@ jobs:
         with:
           name: boot-nethunter
           path: boot.img
+
+      - name: Prepare full artifacts
+        run: |
+          mkdir -p output
+          cp out/arch/arm64/boot/Image output/
+          find . -path ./modules_out -prune -o -name "*.ko" -print -exec cp {} output/ \;
+          cp -r modules_out/lib/modules/* output/ 2>/dev/null || true
+          ls -lh output/
+
+      - name: Upload full artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nethunter-kernel-a14-full
+          path: output/
