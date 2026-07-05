@@ -22,36 +22,35 @@ jobs:
           # Ensure mold is on PATH
           which mold
 
-      - name: Download AOSP clang prebuilt
+      - name: Download AOSP clang r450784d (Droidian mirror)
         run: |
           set -e
           CLANG_DEST="/tmp/aosp-clang"
           mkdir -p "$CLANG_DEST"
 
-          # Clone the AOSP clang repo with sparse checkout (fast, ~10 files initially)
-          # Then fetch just the latest clang version directory
-          echo "Cloning AOSP clang repo (sparse)..."
+          echo "Cloning clang-r450784d from Droidian mirror (sparse)..."
           git clone --depth 1 --filter=blob:none --sparse \
-            "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86" \
+            "https://github.com/droidian/android-platform-prebuilts-clang-host-linux-x86-33" \
             /tmp/aosp-clang-repo 2>&1
 
           cd /tmp/aosp-clang-repo
-          # Find latest clang-r* directory (exclude clang-stable, clang-* numeric ones)
-          CLANG_DIR=$(git ls-tree --name-only HEAD | grep '^clang-r' | sort -V | tail -1)
-          echo "Latest clang version: $CLANG_DIR"
-
-          # Sparse checkout just that directory
-          git sparse-checkout set "$CLANG_DIR" 2>&1
+          # Checkout just clang-r450784d and llvm-binutils-stable
+          git sparse-checkout set clang-r450784d llvm-binutils-stable 2>&1
           git checkout 2>&1
 
-          # Move to final location
-          mv "$CLANG_DIR"/* "$CLANG_DEST/" 2>/dev/null || true
+          # Move clang to final location
+          mv clang-r450784d/* "$CLANG_DEST/" 2>/dev/null || true
+          # Also copy llvm-binutils (provides aarch64-linux-gnu-* tools)
+          cp -r llvm-binutils-stable/* "$CLANG_DEST/" 2>/dev/null || true
           cd /
           rm -rf /tmp/aosp-clang-repo
 
           echo "=== Final clang location ==="
           ls -la "$CLANG_DEST/bin/clang" 2>/dev/null || echo "clang not found!"
-          ls "$CLANG_DEST/bin/aarch64-linux-gnu-*" 2>/dev/null || echo "(no aarch64 binutils)"
+          echo "=== aarch64 binutils ==="
+          ls "$CLANG_DEST/bin/aarch64-linux-gnu-objdump" 2>/dev/null || echo "(no aarch64 binutils in clang dir)"
+          echo "=== clang version ==="
+          "$CLANG_DEST/bin/clang" --version 2>&1 | head -3
 
       - name: Verify toolchain
         run: |
@@ -73,17 +72,18 @@ jobs:
       - name: Create NetHunter defconfig
         run: |
           cat arch/arm64/configs/a14noavbp_defconfig > arch/arm64/configs/exynos850-nethunter_defconfig
+          # WiFi USB drivers (built-in to avoid module signing issues)
           echo "CONFIG_WLAN_VENDOR_ATH=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
           echo "CONFIG_WLAN_VENDOR_REALTEK=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
           echo "CONFIG_WLAN_VENDOR_MEDIATEK=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_MT7601U=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_RTL8XXXU=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_MT7601U=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_RTL8XXXU=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
           echo "CONFIG_RTL8XXXU_UNTESTED=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_ATH9K_HTC=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_CARL9170=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_USB_G_HID=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_BT_HIDP=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_ATH9K_HTC=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          echo "CONFIG_CARL9170=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
           echo "CONFIG_MAC80211_MESH=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
+          # USB HID gadget (BadUSB) - legacy interface for compatibility
+          echo "CONFIG_USB_G_HID=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
 
       - name: Build kernel
         run: |
