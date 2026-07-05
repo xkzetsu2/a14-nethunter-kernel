@@ -140,15 +140,6 @@ jobs:
           MOD_VER=$(git rev-parse --short HEAD)
           BUILD_ARGS="LOCALVERSION=-nethunter-a14-${MOD_VER} KBUILD_BUILD_USER=opencode KBUILD_BUILD_HOST=ci O=out"
 
-          # Debug: check what's in the source tree
-          echo "=== Source tree debug ==="
-          ls -la .config 2>&1 || true
-          ls -la include/config/ 2>&1 || true
-          ls -la include/generated/ 2>&1 || true
-          ls -la arch/arm64/include/generated/ 2>&1 || true
-          git status --short 2>&1 | head -20 || true
-          echo "=== End debug ==="
-
           # Configure
           make -C . O=out ARCH=arm64 LLVM=1 CC=clang \
             CROSS_COMPILE=${CROSS_COMPILE} \
@@ -163,11 +154,11 @@ jobs:
             scripts/config --file out/.config --disable CFI_CLANG_SHADOW
           fi
 
-          # Build kernel (dtbs + Image + modules) - same as langsdorff
+          # Build kernel (Image + dtbs) - same as langsdorff
           make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
             CROSS_COMPILE=${CROSS_COMPILE} \
             LDFLAGS="-fuse-ld=mold" \
-            ${BUILD_ARGS}
+            ${BUILD_ARGS} Image dtbs
 
           # Also build modules
           make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
@@ -195,6 +186,55 @@ jobs:
         with:
           name: boot-nethunter
           path: boot.img
+
+      - name: Package AnyKernel3
+        run: |
+          echo "=== Downloading AnyKernel3 ==="
+          git clone --depth 1 https://github.com/osm0sis/AnyKernel3 /tmp/anykernel
+
+          echo "=== Identifying DTBs ==="
+          DTB_DIR="out/arch/arm64/boot/dts"
+          find "$DTB_DIR" -name "*.dtb" 2>/dev/null | head -5 || echo "No dtb files found"
+
+          echo "=== Setting up AnyKernel3 ==="
+          # Copy kernel
+          cp out/arch/arm64/boot/Image /tmp/anykernel/
+          # Copy dtb(s) if they exist
+          for dtb in $(find "$DTB_DIR" -name "*.dtb" 2>/dev/null); do
+            cp "$dtb" /tmp/anykernel/
+          done
+          # Copy dtbo if it exists
+          cp out/arch/arm64/boot/dtbo.img /tmp/anykernel/ 2>/dev/null || true
+
+          echo "=== Configuring anykernel.sh ==="
+          cat > /tmp/anykernel/anykernel.sh << 'ANY'
+# AnyKernel3 - exynos850 (a13/a14/m14)
+device.name1=a13
+device.name2=a13x
+device.name3=a14
+device.name4=a14m
+device.name5=m14
+device.name6=m14x
+block=/dev/block/by-name/boot;
+is_slot_device=0;
+ramdisk_compression=auto;
+. tools/ak3-core.sh;
+split_boot;
+flash_boot;
+ANY
+
+          echo "=== Creating zip ==="
+          cd /tmp/anykernel
+          rm -rf .git README.md
+          zip -r9 /tmp/NetHunter-A14-AnyKernel3.zip * -x "*.git*"
+          ls -lh /tmp/NetHunter-A14-AnyKernel3.zip
+          cd -
+
+      - name: Upload AnyKernel3
+        uses: actions/upload-artifact@v4
+        with:
+          name: nethunter-anykernel3
+          path: /tmp/NetHunter-A14-AnyKernel3.zip
 
       - name: Prepare full artifacts
         run: |
