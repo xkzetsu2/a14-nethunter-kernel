@@ -207,21 +207,21 @@ jobs:
           cp out/arch/arm64/boot/dtbo.img /tmp/anykernel/ 2>/dev/null || true
 
           echo "=== Configuring anykernel.sh ==="
-          cat > /tmp/anykernel/anykernel.sh << 'ANY'
-# AnyKernel3 - exynos850 (a13/a14/m14)
-device.name1=a13
-device.name2=a13x
-device.name3=a14
-device.name4=a14m
-device.name5=m14
-device.name6=m14x
-block=/dev/block/by-name/boot;
-is_slot_device=0;
-ramdisk_compression=auto;
-. tools/ak3-core.sh;
-split_boot;
-flash_boot;
-ANY
+          printf '%s\n' \
+            '# AnyKernel3 - exynos850 (a13/a14/m14)' \
+            'device.name1=a13' \
+            'device.name2=a13x' \
+            'device.name3=a14' \
+            'device.name4=a14m' \
+            'device.name5=m14' \
+            'device.name6=m14x' \
+            'block=/dev/block/by-name/boot;' \
+            'is_slot_device=0;' \
+            'ramdisk_compression=auto;' \
+            '. tools/ak3-core.sh;' \
+            'split_boot;' \
+            'flash_boot;' \
+            > /tmp/anykernel/anykernel.sh
 
           echo "=== Creating zip ==="
           cd /tmp/anykernel
