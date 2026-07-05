@@ -140,9 +140,14 @@ jobs:
           MOD_VER=$(git rev-parse --short HEAD)
           BUILD_ARGS="LOCALVERSION=-nethunter-a14-${MOD_VER} KBUILD_BUILD_USER=opencode KBUILD_BUILD_HOST=ci O=out"
 
-          # Extra safety: remove tracked auto-generated files again
-          rm -rf include/config include/generated arch/arm64/include/generated .config
-          rm -rf out modules_out
+          # Debug: check what's in the source tree
+          echo "=== Source tree debug ==="
+          ls -la .config 2>&1
+          ls -la include/config/ 2>&1
+          ls -la include/generated/ 2>&1
+          ls -la arch/arm64/include/generated/ 2>&1
+          git status --short 2>&1 | head -20
+          echo "=== End debug ==="
 
           # Configure
           make -C . O=out ARCH=arm64 LLVM=1 CC=clang \
