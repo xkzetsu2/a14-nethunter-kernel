@@ -81,8 +81,14 @@ jobs:
           cp -r modules_out/lib/modules/* output/ 2>/dev/null || true
           ls -lh output/
 
-      - name: Upload artifacts
+      - name: Upload full artifacts (kernel + modules)
         uses: actions/upload-artifact@v4
         with:
-          name: nethunter-kernel-a14
+          name: nethunter-kernel-a14-full
           path: output/
+
+      - name: Upload kernel image only
+        uses: actions/upload-artifact@v4
+        with:
+          name: nethunter-kernel-a14-image
+          path: output/Image
