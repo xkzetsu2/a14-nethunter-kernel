@@ -91,7 +91,11 @@ jobs:
 
       - name: Clean build tree
         run: |
+          # Remove generated/config files tracked in repo that trigger "source tree not clean"
           make mrproper 2>/dev/null || true
+          rm -rf include/config include/generated
+          rm -rf arch/arm64/include/generated
+          rm -f .config
           rm -rf out modules_out
 
       - name: Create NetHunter defconfig
@@ -138,8 +142,8 @@ jobs:
             CROSS_COMPILE=${CROSS_COMPILE} \
             exynos850-nethunter_defconfig
 
-          # Check if CFI symbols exist in this clang version
-          if echo 'int main(){}' | ${CC} -fsanitize=cfi -c -x c - -o /dev/null 2>&1; then
+          # Check if CFI symbols exist in this clang version (needs -flto to work)
+          if echo 'int main(){}' | ${CC} -flto -fsanitize=cfi -c -x c - -o /dev/null 2>&1; then
             echo "CFI SUPPORTED - keeping enabled"
           else
             echo "CFI NOT SUPPORTED - disabling"
