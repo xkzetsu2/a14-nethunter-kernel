@@ -45,11 +45,13 @@ jobs:
       - name: Configure kernel
         run: |
           make ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
-            O=out exynos850-nethunter_defconfig
-          scripts/config --file out/.config --disable KASAN
-          scripts/config --file out/.config --disable KASAN_INLINE
-          scripts/config --file out/.config --disable PCIEAER
-          scripts/config --file out/.config --disable DEBUG_INFO_BTF
+            mrproper
+          make ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
+            exynos850-nethunter_defconfig
+          scripts/config --file .config --disable KASAN
+          scripts/config --file .config --disable KASAN_INLINE
+          scripts/config --file .config --disable PCIEAER
+          scripts/config --file .config --disable DEBUG_INFO_BTF
           sed -i 's/-Werror=strict-prototypes/-Wno-error=strict-prototypes/g' Makefile
           sed -i 's/-Werror=implicit-function-declaration/-Wno-error=implicit-function-declaration/g' Makefile
           sed -i 's/-Werror=implicit-int/-Wno-error=implicit-int/g' Makefile
@@ -60,19 +62,19 @@ jobs:
       - name: Build kernel (dtbs first, then kernel, then modules)
         run: |
           BUILD_ARGS="LOCALVERSION=-nethunter-a14-$(git rev-parse --short HEAD) KBUILD_BUILD_USER=opencode KBUILD_BUILD_HOST=ci"
-          make -j$(nproc) -C $(pwd) ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
-            LDFLAGS="-fuse-ld=mold" O=out $BUILD_ARGS dtbs
-          make -j$(nproc) -C $(pwd) ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
-            LDFLAGS="-fuse-ld=mold" O=out $BUILD_ARGS
-          make -j$(nproc) -C $(pwd) ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
-            LDFLAGS="-fuse-ld=mold" O=out INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" \
+          make -j$(nproc) ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
+            LDFLAGS="-fuse-ld=mold" $BUILD_ARGS dtbs
+          make -j$(nproc) ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
+            LDFLAGS="-fuse-ld=mold" $BUILD_ARGS
+          make -j$(nproc) ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
+            LDFLAGS="-fuse-ld=mold" INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" \
             INSTALL_MOD_PATH=modules_out $BUILD_ARGS modules_install
 
       - name: Prepare artifacts
         run: |
           mkdir -p output
-          cp out/arch/arm64/boot/Image output/
-          find . -path ./out -prune -o -path ./modules_out -prune -o -name "*.ko" -print -exec cp {} output/ \;
+          cp arch/arm64/boot/Image output/
+          find . -path ./modules_out -prune -o -name "*.ko" -print -exec cp {} output/ \;
           cp -r modules_out/lib/modules/* output/ 2>/dev/null || true
           ls -lh output/
 
