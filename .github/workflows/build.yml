@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,36 +33,14 @@ jobs:
           sudo ln -sf /usr/bin/llvm-objdump-14 /usr/local/bin/llvm-objdump
           sudo ln -sf /usr/bin/llvm-strip-14 /usr/local/bin/llvm-strip
 
-      - name: Create NetHunter defconfig
+      - name: Configure stock kernel
         run: |
-          cat arch/arm64/configs/exynos850-a14nsxx_defconfig > arch/arm64/configs/exynos850-nethunter_defconfig
-          # Enable vendor WiFi drivers first (before module options)
-          echo "CONFIG_WLAN_VENDOR_ATH=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_WLAN_VENDOR_REALTEK=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_WLAN_VENDOR_MEDIATEK=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_MT7601U=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_RTL8XXXU=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_RTL8XXXU_UNTESTED=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_ATH9K_HTC=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_CARL9170=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_USB_G_HID=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_NETFILTER_XT_MATCH_IPRANGE=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_BT_HIDP=m" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_MAC80211_MESH=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-
-      - name: Configure kernel
-        run: |
-          make ARCH=arm64 LLVM=1 exynos850-nethunter_defconfig
+          make ARCH=arm64 LLVM=1 exynos850-a14nsxx_defconfig
+          # Minimo necessario para compilar com clang-14
           scripts/config --file .config --disable KASAN
           scripts/config --file .config --disable KASAN_INLINE
-          scripts/config --file .config --disable KASAN_STACK
-          scripts/config --file .config --disable DEBUG_INFO_BTF
           scripts/config --file .config --disable PCIEAER
-          # Disable CFI/SHADOW_CALL_STACK (Clang-version sensitive, causes bootloop with apt clang-14)
-          scripts/config --file .config --disable CFI_CLANG
-          scripts/config --file .config --disable CFI_CLANG_SHADOW
-          scripts/config --file .config --disable SHADOW_CALL_STACK
-          # Keep LTO (ThinLTO) enabled
+          scripts/config --file .config --disable DEBUG_INFO_BTF
           # Fix Werror in Makefile (Samsung vendor code breaks with -Werror)
           sed -i 's/-Werror=strict-prototypes/-Wno-error=strict-prototypes/g' Makefile
           sed -i 's/-Werror=implicit-function-declaration/-Wno-error=implicit-function-declaration/g' Makefile
