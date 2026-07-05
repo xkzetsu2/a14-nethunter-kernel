@@ -69,6 +69,10 @@ jobs:
           ls $CLANG_DIR/bin/llvm-* 2>/dev/null | head -5
           ls $CLANG_DIR/bin/aarch64-linux-gnu-* 2>/dev/null | head -5 || echo "(no aarch64 binutils)"
 
+      - name: Clean build tree
+        run: |
+          rm -rf out modules_out
+
       - name: Create NetHunter defconfig
         run: |
           cat arch/arm64/configs/a14noavbp_defconfig > arch/arm64/configs/exynos850-nethunter_defconfig
