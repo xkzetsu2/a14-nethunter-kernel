@@ -92,3 +92,19 @@ jobs:
         with:
           name: nethunter-kernel-a14-image
           path: output/Image
+
+      - name: Create boot.img
+        run: |
+          python3 kernel_build/mkbootimg/mkbootimg.py \
+            --header_version 4 \
+            --kernel output/Image \
+            --output boot.img \
+            --os_version 14.0.0 \
+            --os_patch_level 2025-04
+          ls -lh boot.img
+
+      - name: Upload boot.img
+        uses: actions/upload-artifact@v4
+        with:
+          name: boot-nethunter
+          path: boot.img
