@@ -44,8 +44,7 @@ jobs:
 
       - name: Configure kernel
         run: |
-          make ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
-            mrproper
+          # No mrproper needed for in-tree build
           make ARCH=arm64 LLVM=1 CC=clang CROSS_COMPILE=aarch64-linux-gnu- \
             exynos850-nethunter_defconfig
           scripts/config --file .config --disable KASAN
