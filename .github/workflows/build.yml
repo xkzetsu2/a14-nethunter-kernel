@@ -159,8 +159,8 @@ jobs:
             echo "CFI SUPPORTED - keeping enabled"
           else
             echo "CFI NOT SUPPORTED - disabling"
-            scripts/config --file .config --disable CFI_CLANG
-            scripts/config --file .config --disable CFI_CLANG_SHADOW
+            scripts/config --file out/.config --disable CFI_CLANG
+            scripts/config --file out/.config --disable CFI_CLANG_SHADOW
           fi
 
           # Build kernel (dtbs + Image + modules) - same as langsdorff
