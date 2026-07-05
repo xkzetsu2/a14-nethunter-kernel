@@ -91,12 +91,15 @@ jobs:
 
       - name: Clean build tree
         run: |
-          # Remove generated/config files tracked in repo that trigger "source tree not clean"
-          make mrproper 2>/dev/null || true
-          rm -rf include/config include/generated
-          rm -rf arch/arm64/include/generated
-          rm -f .config
+          # Remove tracked auto-generated files that trigger "source tree not clean"
+          rm -rf include/config include/generated arch/arm64/include/generated .config
+          # Also remove any untracked build artifacts
+          git clean -xdf -e include/config -e include/generated -e arch/arm64/include/generated 2>/dev/null || true
           rm -rf out modules_out
+          echo "=== Post-clean check ==="
+          test -f .config && echo "WARNING: .config still present" || echo "OK: .config removed"
+          test -d include/config && echo "WARNING: include/config still present" || echo "OK: include/config removed"
+          test -d arch/arm64/include/generated && echo "WARNING: arch/arm64/include/generated still present" || echo "OK: arch/arm64/include/generated removed"
 
       - name: Create NetHunter defconfig
         run: |
@@ -136,6 +139,10 @@ jobs:
 
           MOD_VER=$(git rev-parse --short HEAD)
           BUILD_ARGS="LOCALVERSION=-nethunter-a14-${MOD_VER} KBUILD_BUILD_USER=opencode KBUILD_BUILD_HOST=ci O=out"
+
+          # Extra safety: remove tracked auto-generated files again
+          rm -rf include/config include/generated arch/arm64/include/generated .config
+          rm -rf out modules_out
 
           # Configure
           make -C . O=out ARCH=arm64 LLVM=1 CC=clang \
