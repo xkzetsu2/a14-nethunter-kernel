@@ -80,13 +80,8 @@ jobs:
             CROSS_COMPILE=${CROSS_COMPILE} \
             Image
 
-      - name: Upload Image via GitHub Release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          echo "Uploading Image to GitHub Release..."
-          gh release delete nethunter-kernel 2>/dev/null || true
-          gh release create nethunter-kernel out/arch/arm64/boot/Image \
-            --title "NetHunter Kernel Image" \
-            --notes "SuKisu-Ultra + NetHunter USB WiFi"
-          echo "Download from: https://github.com/${{ github.repository }}/releases/tag/nethunter-kernel"
+      - name: Upload Image
+        uses: actions/upload-artifact@v4
+        with:
+          name: Image
+          path: out/arch/arm64/boot/Image
