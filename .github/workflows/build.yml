@@ -208,15 +208,12 @@ jobs:
 
           echo "=== Configuring anykernel.sh ==="
           printf '%s\n' \
-            '# AnyKernel3 - exynos850 (a13/a14/m14)' \
-            'device.name1=a13' \
-            'device.name2=a13x' \
-            'device.name3=a14' \
-            'device.name4=a14m' \
-            'device.name5=m14' \
-            'device.name6=m14x' \
+            '# AnyKernel3 - exynos850 (a13/a14/m14) - universal' \
+            'do.devicecheck=0' \
+            'do.modules=0' \
+            'do.cleanup=1' \
             'block=/dev/block/by-name/boot;' \
-            'is_slot_device=0;' \
+            'is_slot_device=auto;' \
             'ramdisk_compression=auto;' \
             '. tools/ak3-core.sh;' \
             'split_boot;' \
