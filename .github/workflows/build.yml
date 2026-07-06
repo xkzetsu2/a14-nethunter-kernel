@@ -145,14 +145,8 @@ jobs:
             CROSS_COMPILE=${CROSS_COMPILE} \
             exynos850-nethunter_defconfig
 
-          # Check if CFI symbols exist in this clang version (needs -flto to work)
-          if echo 'int main(){}' | ${CC} -flto -fsanitize=cfi -c -x c - -o /dev/null 2>&1; then
-            echo "CFI SUPPORTED - keeping enabled"
-          else
-            echo "CFI NOT SUPPORTED - disabling"
-            scripts/config --file out/.config --disable CFI_CLANG
-            scripts/config --file out/.config --disable CFI_CLANG_SHADOW
-          fi
+          # CFI is supported with clang r450784d (same as original kernel)
+          # Keep whatever the defconfig specified
 
           # Build kernel (Image + dtbs) - same as langsdorff
           make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
