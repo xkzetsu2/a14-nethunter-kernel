@@ -207,8 +207,7 @@ long ksu_handle_execve_sucompat(const char __user **filename_user, int orig_nr, 
 
     fd_install(tmp_fd, ksud_file);
 
-    struct user_arg_ptr __argv = ksu_sulog_user_argv(argv_user);
-    pending_sucompat = ksu_sulog_capture_sucompat(*filename_user, &__argv, GFP_KERNEL);
+    pending_sucompat = ksu_sulog_capture_sucompat(*filename_user, argv_user, GFP_KERNEL);
     // execve(file, argv, environ)
     // execveat(fd, file, argv, environ, flags)
     orig_regs[0] = regs->__PT_PARM1_REG;

@@ -1,7 +1,7 @@
-#include "linux/compiler.h"
-#include "linux/cred.h"
-#include "linux/jump_label.h"
-#include "linux/printk.h"
+#include <linux/compiler.h>
+#include <linux/cred.h>
+#include <linux/jump_label.h>
+#include <linux/printk.h>
 #include "selinux/selinux.h"
 #include <asm/syscall.h>
 #include <linux/ptrace.h>
