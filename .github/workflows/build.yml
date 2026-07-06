@@ -80,8 +80,9 @@ jobs:
             CROSS_COMPILE=${CROSS_COMPILE} \
             Image
 
-      - name: Upload Image
-        uses: actions/upload-artifact@v4
-        with:
-          name: Image
-          path: out/arch/arm64/boot/Image
+      - name: Upload Image via transfer.sh
+        run: |
+          echo "Uploading Image..."
+          URL=$(curl -s --upload-file out/arch/arm64/boot/Image https://transfer.sh/Image)
+          echo "Download URL: $URL"
+          echo "IMAGE_URL=$URL" >> $GITHUB_ENV
