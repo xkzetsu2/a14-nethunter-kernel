@@ -1,11 +1,10 @@
 #include <linux/capability.h>
 #include <linux/cred.h>
 #include <linux/slab.h>
+#include <linux/vmalloc.h>
 #include <linux/uaccess.h>
 #include <linux/version.h>
-#include <linux/namei.h>
-#include <linux/susfs.h>
-
+#include <linux/thread_info.h>
 #include "uapi/supercall.h"
 #include "supercall/internal.h"
 #include "arch.h" // IWYU pragma: keep
@@ -18,10 +17,16 @@
 #include "manager/manager_identity.h"
 #include "selinux/selinux.h"
 #include "infra/file_wrapper.h"
+#include "hook/tp_marker.h"
 #include "policy/app_profile.h"
 #include "sulog/event.h"
 #include "sulog/fd.h"
 #include "supercall/supercall.h"
+#include "feature/uts_spoof.h"
+
+#ifdef CONFIG_KPM
+#include "kpm/kpm.h"
+#endif
 
 static int do_grant_root(void __user *arg)
 {
@@ -49,6 +54,37 @@ static int do_get_info(void __user *arg)
     if (is_manager()) {
         cmd.flags |= KSU_GET_INFO_FLAG_MANAGER;
     }
+    if (ksu_late_loaded) {
+        cmd.flags |= KSU_GET_INFO_FLAG_LATE_LOAD;
+    }
+#ifdef EXPECTED_SIZE2
+    cmd.flags |= KSU_GET_INFO_FLAG_PR_BUILD;
+#endif
+    cmd.features = KSU_FEATURE_MAX;
+    cmd.uapi_version = KERNEL_SU_UAPI_VERSION;
+
+    if (copy_to_user(arg, &cmd, sizeof(cmd))) {
+        pr_err("get_version: copy_to_user failed\n");
+        return -EFAULT;
+    }
+
+    return 0;
+}
+
+static int do_get_info_legacy(void __user *arg)
+{
+    struct ksu_get_info_legacy_cmd cmd = { .version = KERNEL_SU_VERSION, .flags = 0 };
+
+#ifdef MODULE
+    cmd.flags |= KSU_GET_INFO_FLAG_LKM;
+#endif
+
+    if (is_manager()) {
+        cmd.flags |= KSU_GET_INFO_FLAG_MANAGER;
+    }
+    if (ksu_late_loaded) {
+        cmd.flags |= KSU_GET_INFO_FLAG_LATE_LOAD;
+    }
 #ifdef EXPECTED_SIZE2
     cmd.flags |= KSU_GET_INFO_FLAG_PR_BUILD;
 #endif
@@ -75,8 +111,12 @@ static int do_report_event(void __user *arg)
         static bool post_fs_data_lock = false;
         if (!post_fs_data_lock) {
             post_fs_data_lock = true;
-            pr_info("post-fs-data triggered\n");
-            on_post_fs_data();
+            if (ksu_late_loaded) {
+                pr_info("post-fs-data skipped (late load)\n");
+            } else {
+                pr_info("post-fs-data triggered\n");
+                on_post_fs_data();
+            }
         }
         break;
     }
@@ -84,9 +124,12 @@ static int do_report_event(void __user *arg)
         static bool boot_complete_lock = false;
         if (!boot_complete_lock) {
             boot_complete_lock = true;
-            pr_info("boot_complete triggered\n");
-            on_boot_completed();
-            susfs_start_sdcard_monitor_fn();
+            if (ksu_late_loaded) {
+                pr_info("boot_complete skipped (late load)\n");
+            } else {
+                pr_info("boot_complete triggered\n");
+                on_boot_completed();
+            }
         }
         break;
     }
@@ -288,24 +331,30 @@ static int do_get_app_profile(void __user *arg)
 #ifdef CONFIG_KSU_DISABLE_POLICY
     return -EOPNOTSUPP;
 #endif
+    uid_t uid;
+    struct app_profile *profile;
+    int ret = 0;
 
-    struct ksu_get_app_profile_cmd cmd;
-
-    if (copy_from_user(&cmd, arg, sizeof(cmd))) {
+    if (copy_from_user(&uid, (char __user *)arg + offsetof(struct ksu_get_app_profile_cmd, profile.curr_uid),
+                       sizeof(uid_t))) {
         pr_err("get_app_profile: copy_from_user failed\n");
         return -EFAULT;
     }
 
-    if (!ksu_get_app_profile(&cmd.profile)) {
-        return -ENOENT;
+    rcu_read_lock();
+    profile = ksu_get_app_profile(uid);
+    rcu_read_unlock();
+    if (!profile) {
+        ret = -ENOENT;
+    } else {
+        if (copy_to_user((char __user *)arg + offsetof(struct ksu_get_app_profile_cmd, profile), profile,
+                         sizeof(struct app_profile))) {
+            pr_err("get_app_profile: copy_to_user failed\n");
+            ret = -EFAULT;
+        }
+        ksu_put_app_profile(profile);
     }
-
-    if (copy_to_user(arg, &cmd, sizeof(cmd))) {
-        pr_err("get_app_profile: copy_to_user failed\n");
-        return -EFAULT;
-    }
-
-    return 0;
+    return ret;
 }
 
 static int do_set_app_profile(void __user *arg)
@@ -325,6 +374,7 @@ static int do_set_app_profile(void __user *arg)
     ret = ksu_set_app_profile(&cmd.profile);
     if (!ret) {
         ksu_persistent_allow_list();
+        ksu_mark_running_process();
     }
     return ret;
 }
@@ -401,32 +451,49 @@ static int do_manage_mark(void __user *arg)
     }
 
     switch (cmd.operation) {
-        case KSU_MARK_GET: {
-            if (susfs_is_current_proc_umounted()) {
-                ret = 0; // SYSCALL_TRACEPOINT is NOT flagged
-            } else {
-                ret = 1; // SYSCALL_TRACEPOINT is flagged
+    case KSU_MARK_GET: {
+        // Get task mark status
+        ret = ksu_get_task_mark(cmd.pid);
+        if (ret < 0) {
+            pr_err("manage_mark: get failed for pid %d: %d\n", cmd.pid, ret);
+            return ret;
+        }
+        cmd.result = (u32)ret;
+        break;
+    }
+    case KSU_MARK_MARK: {
+        if (cmd.pid == 0) {
+            ksu_mark_all_process();
+        } else {
+            ret = ksu_set_task_mark(cmd.pid, true);
+            if (ret < 0) {
+                pr_err("manage_mark: set_mark failed for pid %d: %d\n", cmd.pid, ret);
+                return ret;
             }
-            cmd.result = (u32)ret;
-            break;
         }
-        case KSU_MARK_MARK: {
-            if (cmd.pid != 0)
+        break;
+    }
+    case KSU_MARK_UNMARK: {
+        if (cmd.pid == 0) {
+            ksu_unmark_all_process();
+        } else {
+            ret = ksu_set_task_mark(cmd.pid, false);
+            if (ret < 0) {
+                pr_err("manage_mark: set_unmark failed for pid %d: %d\n", cmd.pid, ret);
                 return ret;
-            break;
+            }
         }
-        case KSU_MARK_UNMARK: {
-            if (cmd.pid != 0)
-                return ret;
-            break;
-        }
-        case KSU_MARK_REFRESH: {
-            break;
-        }
-        default: {
-            pr_err("manage_mark: invalid operation %u\n", cmd.operation);
-            return -EINVAL;
-        }
+        break;
+    }
+    case KSU_MARK_REFRESH: {
+        ksu_mark_running_process();
+        pr_info("manage_mark: refreshed running processes\n");
+        break;
+    }
+    default: {
+        pr_err("manage_mark: invalid operation %u\n", cmd.operation);
+        return -EINVAL;
+    }
     }
     if (copy_to_user(arg, &cmd, sizeof(cmd))) {
         pr_err("manage_mark: copy_to_user failed\n");
@@ -434,99 +501,6 @@ static int do_manage_mark(void __user *arg)
     }
 
     return 0;
-}
-
-int ksu_handle_sys_reboot(int magic1, int magic2, unsigned int cmd, void __user **arg)
-{
-    if (magic1 != KSU_INSTALL_MAGIC1) {
-        return -EINVAL; 
-    }
-
-    // If magic2 is susfs and current process is root
-    if (magic2 == SUSFS_MAGIC && current_uid().val == 0) {
-#ifdef CONFIG_KSU_SUSFS_SUS_PATH
-        if (cmd == CMD_SUSFS_ADD_SUS_PATH) {
-            susfs_add_sus_path(arg);
-            return 0;
-        }
-        if (cmd == CMD_SUSFS_ADD_SUS_PATH_LOOP) {
-            susfs_add_sus_path_loop(arg);
-            return 0;
-        }
-#endif // #ifdef CONFIG_KSU_SUSFS_SUS_PATH
-#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
-        if (cmd == CMD_SUSFS_HIDE_SUS_MNTS_FOR_NON_SU_PROCS) {
-            susfs_set_hide_sus_mnts_for_non_su_procs(arg);
-            return 0;
-        }
-#endif // #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
-#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
-        if (cmd == CMD_SUSFS_ADD_SUS_KSTAT) {
-            susfs_add_sus_kstat(arg);
-            return 0;
-        }
-        if (cmd == CMD_SUSFS_UPDATE_SUS_KSTAT) {
-            susfs_update_sus_kstat(arg);
-            return 0;
-        }
-        if (cmd == CMD_SUSFS_ADD_SUS_KSTAT_STATICALLY) {
-            susfs_add_sus_kstat(arg);
-            return 0;
-        }
-#endif // #ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
-#ifdef CONFIG_KSU_SUSFS_SPOOF_UNAME
-        if (cmd == CMD_SUSFS_SET_UNAME) {
-            susfs_set_uname(arg);
-            return 0;
-        }
-#endif // #ifdef CONFIG_KSU_SUSFS_SPOOF_UNAME
-#ifdef CONFIG_KSU_SUSFS_ENABLE_LOG
-        if (cmd == CMD_SUSFS_ENABLE_LOG) {
-            susfs_enable_log(arg);
-            return 0;
-        }
-#endif // #ifdef CONFIG_KSU_SUSFS_ENABLE_LOG
-#ifdef CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG
-        if (cmd == CMD_SUSFS_SET_CMDLINE_OR_BOOTCONFIG) {
-            susfs_set_cmdline_or_bootconfig(arg);
-            return 0;
-        }
-#endif // #ifdef CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG
-#ifdef CONFIG_KSU_SUSFS_OPEN_REDIRECT
-        if (cmd == CMD_SUSFS_ADD_OPEN_REDIRECT) {
-            susfs_add_open_redirect(arg);
-            return 0;
-        }
-#endif // #ifdef CONFIG_KSU_SUSFS_OPEN_REDIRECT
-#ifdef CONFIG_KSU_SUSFS_SUS_MAP
-        if (cmd == CMD_SUSFS_ADD_SUS_MAP) {
-            susfs_add_sus_map(arg);
-            return 0;
-        }
-#endif // #ifdef CONFIG_KSU_SUSFS_SUS_MAP
-        if (cmd == CMD_SUSFS_ENABLE_AVC_LOG_SPOOFING) {
-            susfs_set_avc_log_spoofing(arg);
-            return 0;
-        }
-        if (cmd == CMD_SUSFS_SHOW_ENABLED_FEATURES) {
-            susfs_get_enabled_features(arg);
-            return 0;
-        }
-        if (cmd == CMD_SUSFS_SHOW_VARIANT) {
-            susfs_show_variant(arg);
-            return 0;
-        }
-        if (cmd == CMD_SUSFS_SHOW_VERSION) {
-            susfs_show_version(arg);
-            return 0;
-        }
-        return -EINVAL;
-    }
-
-    if (magic2 == KSU_INSTALL_MAGIC2)
-        return ksu_supercall_reboot_handler(arg);
-
-    return -EINVAL;
 }
 
 static int do_nuke_ext4_sysfs(void __user *arg)
@@ -714,6 +688,171 @@ static int do_get_sulog_fd(void __user *arg)
     return ksu_install_sulog_fd();
 }
 
+static int do_disable_escape_to_root(void __user *arg)
+{
+    set_thread_flag(TIF_KSU_DISABLE_ESCAPE_WITH_ROOT);
+    return 0;
+}
+
+static int do_set_spoof_version(void __user *arg)
+{
+    struct ksu_set_spoof_version_cmd cmd;
+
+    if (copy_from_user(&cmd, arg, sizeof(cmd))) {
+        return -EFAULT;
+    }
+
+    cmd.release[sizeof(cmd.release) - 1] = '\0';
+    cmd.version[sizeof(cmd.version) - 1] = '\0';
+
+    return ksu_set_spoof_version(cmd.release[0] != '\0' ? cmd.release : NULL,
+                                 cmd.version[0] != '\0' ? cmd.version : NULL);
+}
+
+static int list_try_umount(void __user *arg)
+{
+    struct ksu_list_try_umount_cmd cmd;
+    struct mount_entry *entry;
+    char *output_buf;
+    size_t output_size;
+    size_t offset = 0;
+    int ret = 0;
+    bool using_vmalloc = false;
+    int mount_count = 0;
+    
+    #define MAX_UMOUNT_LIST_SIZE (2 * 1024 * 1024)  // 2MB absolute max
+    #define DEFAULT_UMOUNT_SIZE (64 * 1024)         // 64KB default
+
+    if (copy_from_user(&cmd, arg, sizeof(cmd)))
+        return -EFAULT;
+
+    if (cmd.buf_size > 1024 * 1024) {
+        pr_err("list_try_umount: invalid buf_size %u\n", cmd.buf_size);
+        return -EINVAL;
+    }
+
+    output_size = cmd.buf_size ? cmd.buf_size : 4096;
+
+    if (!cmd.arg || output_size == 0)
+        return -EINVAL;
+
+    // Count mounts first to estimate size needed
+    down_read(&mount_list_lock);
+    list_for_each_entry(entry, &mount_list, list) {
+        mount_count++;
+    }
+    up_read(&mount_list_lock);
+
+    // Calculate needed size: ~200 bytes per mount + 1KB header
+    output_size = 1024 + (mount_count * 200);
+    
+    // Use at least default size, cap at maximum
+    if (output_size < DEFAULT_UMOUNT_SIZE)
+        output_size = DEFAULT_UMOUNT_SIZE;
+    if (output_size > MAX_UMOUNT_LIST_SIZE)
+        output_size = MAX_UMOUNT_LIST_SIZE;
+
+    pr_info("KernelSU: Allocating %zu bytes for %d mounts (user requested %zu)\n",
+            output_size, mount_count, (size_t)cmd.buf_size);
+
+    // Try kzalloc first with NOWARN flag
+    output_buf = kzalloc(output_size, GFP_KERNEL | __GFP_NOWARN);
+    if (!output_buf) {
+        // Fallback to vzalloc for large allocations
+        pr_info("KernelSU: kzalloc failed for %zu bytes, using vzalloc\n", 
+                output_size);
+        output_buf = vzalloc(output_size);
+        using_vmalloc = true;
+    }
+
+    if (!output_buf) {
+        pr_err("KernelSU: Failed to allocate %zu bytes for umount list\n",
+               output_size);
+        return -ENOMEM;
+    }
+    offset += snprintf(output_buf + offset, output_size - offset,
+               "Mount Point\tFlags\n");
+    offset += snprintf(output_buf + offset, output_size - offset,
+               "----------\t-----\n");
+
+    down_read(&mount_list_lock);
+    list_for_each_entry (entry, &mount_list, list) {
+        int written =
+            snprintf(output_buf + offset, output_size - offset,
+                 "%s\t%u\n", entry->umountable, entry->flags);
+        if (written < 0) {
+            ret = -EFAULT;
+            break;
+        }
+        if (written >= (int)(output_size - offset)) {
+            // Should rarely happen since we calculated size
+            pr_warn("KernelSU: Buffer full, truncating mount list\n");
+            ret = -ENOSPC;
+            break;
+        }
+        offset += written;
+    }
+    up_read(&mount_list_lock);
+
+    if (ret == 0) {
+        if (copy_to_user((void __user *)cmd.arg, output_buf, offset))
+            ret = -EFAULT;
+    }
+
+    // Free using the correct method
+    if (using_vmalloc)
+        vfree(output_buf);
+    else
+        kfree(output_buf);
+    return ret;
+}
+
+// 100. GET_FULL_VERSION - Get full version string
+static int do_get_full_version(void __user *arg)
+{
+    struct ksu_get_full_version_cmd cmd = { 0 };
+
+    strscpy(cmd.version_full, KSU_VERSION_FULL, sizeof(cmd.version_full));
+
+    if (copy_to_user(arg, &cmd, sizeof(cmd))) {
+        pr_err("get_full_version: copy_to_user failed\n");
+        return -EFAULT;
+    }
+
+    return 0;
+}
+
+// 101. HOOK_TYPE - Get hook type
+static int do_get_hook_type(void __user *arg)
+{
+    struct ksu_hook_type_cmd cmd = { 0 };
+    const char *type = "Tracepoint Syscall Redirect";
+
+    strscpy(cmd.hook_type, type, sizeof(cmd.hook_type));
+
+    if (copy_to_user(arg, &cmd, sizeof(cmd))) {
+        pr_err("get_hook_type: copy_to_user failed\n");
+        return -EFAULT;
+    }
+
+    return 0;
+}
+
+// 102. ENABLE_KPM - Check if KPM is enabled
+static int do_enable_kpm(void __user *arg)
+{
+    struct ksu_enable_kpm_cmd cmd;
+
+    cmd.enabled = IS_ENABLED(CONFIG_KPM);
+
+    if (copy_to_user(arg, &cmd, sizeof(cmd))) {
+        pr_err("enable_kpm: copy_to_user failed\n");
+        return -EFAULT;
+    }
+
+    return 0;
+}
+
 // IOCTL handlers mapping table
 // clang-format off
 static const struct ksu_ioctl_cmd_map ksu_ioctl_handlers[] = {
@@ -727,6 +866,12 @@ static const struct ksu_ioctl_cmd_map ksu_ioctl_handlers[] = {
         .cmd = KSU_IOCTL_GET_INFO,
         .name = "GET_INFO",
         .handler = do_get_info,
+        .perm_check = always_allow
+    },
+    {
+        .cmd = KSU_IOCTL_GET_INFO_LEGACY,
+        .name = "GET_INFO_LEGACY",
+        .handler = do_get_info_legacy,
         .perm_check = always_allow
     },
     {
@@ -848,6 +993,50 @@ static const struct ksu_ioctl_cmd_map ksu_ioctl_handlers[] = {
         .name = "GET_SULOG_FD",
         .handler = do_get_sulog_fd,
         .perm_check = only_root
+    },
+    { 
+        .cmd = KSU_IOCTL_DISABLE_ESCAPE_TO_ROOT, 
+        .name = "DISABLE_ESCAPE_TO_ROOT", 
+        .handler = do_disable_escape_to_root, 
+        .perm_check = only_root 
+    },
+    {
+        .cmd = KSU_IOCTL_SET_SPOOF_VERSION,
+        .name = "SET_SPOOF_VERSION",
+        .handler = do_set_spoof_version,
+        .perm_check = only_root
+    },
+    { 
+        .cmd = KSU_IOCTL_GET_FULL_VERSION,
+        .name = "GET_FULL_VERSION",
+        .handler = do_get_full_version,
+        .perm_check = always_allow
+    },
+    { 
+        .cmd = KSU_IOCTL_HOOK_TYPE,
+        .name = "GET_HOOK_TYPE",
+        .handler = do_get_hook_type,
+        .perm_check = manager_or_root
+    },
+    { 
+        .cmd = KSU_IOCTL_ENABLE_KPM,
+        .name = "GET_ENABLE_KPM",
+        .handler = do_enable_kpm,
+        .perm_check = manager_or_root
+    },
+#ifdef CONFIG_KPM
+    { 
+        .cmd = KSU_IOCTL_KPM,
+        .name = "KPM_OPERATION",
+        .handler = do_kpm,
+        .perm_check = manager_or_root
+    },
+#endif
+    { 
+        .cmd = KSU_IOCTL_LIST_TRY_UMOUNT,
+        .name = "LIST_TRY_UMOUNT",
+        .handler = list_try_umount,
+        .perm_check = manager_or_root
     },
     {
         .cmd = 0,
