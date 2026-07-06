@@ -33,7 +33,7 @@ struct ksu_sulog_identity {
     __u32 euid;
 };
 
-static struct user_arg_ptr ksu_sulog_user_argv(const char __user *const __user *argv_user)
+struct user_arg_ptr ksu_sulog_user_argv(const char __user *const __user *argv_user)
 {
     struct user_arg_ptr argv;
 

@@ -13,6 +13,7 @@ struct ksu_sulog_pending_event;
 int ksu_sulog_events_init(void);
 void ksu_sulog_events_exit(void);
 
+struct user_arg_ptr ksu_sulog_user_argv(const char __user *const __user *argv_user);
 struct ksu_sulog_pending_event *ksu_sulog_capture_sucompat(const char *filename,
                                                            struct user_arg_ptr *argv_user, gfp_t gfp);
 void ksu_sulog_emit_pending(struct ksu_sulog_pending_event *pending, int retval, gfp_t gfp);
