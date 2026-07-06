@@ -19,8 +19,6 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq bc bison flex libssl-dev libelf-dev python3 \
             gcc-aarch64-linux-gnu mold lz4 brotli cpio xz-utils dwarves
-          # Ensure mold is on PATH
-          which mold
 
       - name: Download AOSP clang r450784d (Droidian mirror)
         run: |
@@ -28,215 +26,62 @@ jobs:
           CLANG_DEST="/tmp/aosp-clang"
           mkdir -p "$CLANG_DEST"
 
-          echo "Cloning clang-r450784d from Droidian mirror (sparse)..."
           git clone --depth 1 --filter=blob:none --sparse \
             "https://github.com/droidian/android-platform-prebuilts-clang-host-linux-x86-33" \
-            /tmp/aosp-clang-repo 2>&1
+            /tmp/aosp-clang-repo
 
           cd /tmp/aosp-clang-repo
-          # Checkout just clang-r450784d and llvm-binutils-stable
-          git sparse-checkout set clang-r450784d llvm-binutils-stable 2>&1
-          git checkout 2>&1
+          git sparse-checkout set clang-r450784d llvm-binutils-stable
+          git checkout
 
-          # Move clang to final location
           mv clang-r450784d/* "$CLANG_DEST/" 2>/dev/null || true
-          # Also copy llvm-binutils (provides aarch64-linux-gnu-* tools)
           cp -r llvm-binutils-stable/* "$CLANG_DEST/" 2>/dev/null || true
           cd /
           rm -rf /tmp/aosp-clang-repo
 
-          # Reassemble split binaries (Debian packaging splits large files)
-          echo "=== Reassembling split binaries ==="
           find "$CLANG_DEST" -name '*.split??' -type f | sed 's/\.split[0-9][0-9]$//' | sort -u | while read base; do
             parts=$(ls "${base}.split"?? 2>/dev/null | sort)
             if [ -n "$parts" ]; then
-              echo "Reassembling: $base"
               cat $parts > "$base"
               chmod +x "$base" 2>/dev/null || true
               rm -f ${base}.split??
             fi
           done
-          # clang wrapper expects clang.real -> clang-14
-          # Droidian has stub clang.real (8 bytes), replace with symlink
           rm -f "$CLANG_DEST/bin/clang.real"
           ln -sf clang-14 "$CLANG_DEST/bin/clang.real"
           rm -f "$CLANG_DEST/bin/clang++.real"
           ln -sf clang-14 "$CLANG_DEST/bin/clang++.real"
-          cd /
-
-          echo "=== Final clang location ==="
-          ls -la "$CLANG_DEST/bin/clang" 2>/dev/null || echo "clang not found!"
-          ls -la "$CLANG_DEST/bin/clang.real" 2>/dev/null || echo "clang.real not found!"
-          echo "=== aarch64 binutils ==="
-          ls "$CLANG_DEST/bin/aarch64-linux-gnu-objdump" 2>/dev/null || echo "(no aarch64 binutils in clang dir)"
-          echo "=== clang version ==="
-          "$CLANG_DEST/bin/clang" --version 2>&1 | head -3
-
-      - name: Verify toolchain
-        run: |
-          CLANG_DIR="/tmp/aosp-clang"
-          if [ ! -f "$CLANG_DIR/bin/clang" ]; then
-            echo "ERROR: clang not downloaded!"
-            ls -la "$CLANG_DIR/bin/" 2>/dev/null || echo "bin dir empty"
-            exit 1
-          fi
-          echo "=== CLANG ==="
-          $CLANG_DIR/bin/clang --version 2>&1 | head -3
-          echo "=== CFI check ==="
-          echo 'int main(){}' | $CLANG_DIR/bin/clang -fsanitize=cfi -c -x c - -o /dev/null 2>&1 && \
-            echo "CFI: supported" || echo "CFI: NOT supported"
-          echo "=== Tools ==="
-          ls $CLANG_DIR/bin/llvm-* 2>/dev/null | head -5
-          ls $CLANG_DIR/bin/aarch64-linux-gnu-* 2>/dev/null | head -5 || echo "(no aarch64 binutils)"
 
       - name: Clean build tree
         run: |
-          # Remove tracked auto-generated files that trigger "source tree not clean"
           rm -rf include/config include/generated arch/arm64/include/generated .config
-          # Also remove any untracked build artifacts
           git clean -xdf -e include/config -e include/generated -e arch/arm64/include/generated 2>/dev/null || true
           rm -rf out modules_out
-          echo "=== Post-clean check ==="
-          test -f .config && echo "WARNING: .config still present" || echo "OK: .config removed"
-          test -d include/config && echo "WARNING: include/config still present" || echo "OK: include/config removed"
-          test -d arch/arm64/include/generated && echo "WARNING: arch/arm64/include/generated still present" || echo "OK: arch/arm64/include/generated removed"
-
-      - name: Create NetHunter defconfig
-        run: |
-          cat arch/arm64/configs/a14noavbp_defconfig > arch/arm64/configs/exynos850-nethunter_defconfig
-          # WiFi USB drivers (built-in to avoid module signing issues)
-          echo "CONFIG_WLAN_VENDOR_ATH=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_WLAN_VENDOR_REALTEK=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_WLAN_VENDOR_MEDIATEK=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_MT7601U=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_RTL8XXXU=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_RTL8XXXU_UNTESTED=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_ATH9K_HTC=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_CARL9170=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          echo "CONFIG_MAC80211_MESH=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
-          # USB HID gadget (BadUSB) - legacy interface for compatibility
-          echo "CONFIG_USB_G_HID=y" >> arch/arm64/configs/exynos850-nethunter_defconfig
 
       - name: Build kernel
         run: |
           CLANG_DIR="/tmp/aosp-clang"
-
-          # Setup - same as buildnoavbp.sh
           export CC="${CLANG_DIR}/bin/clang"
           export PATH="${CLANG_DIR}/bin:$PATH"
           export LLVM=1
           export ARCH=arm64
 
-          # CROSS_COMPILE: prefer aarch64-linux-gnu- from clang dir, else system
           if [ -f "${CLANG_DIR}/bin/aarch64-linux-gnu-objdump" ]; then
             export CROSS_COMPILE="${CLANG_DIR}/bin/aarch64-linux-gnu-"
           else
             export CROSS_COMPILE="aarch64-linux-gnu-"
           fi
-          export LD="mold"
-          export LLVM_LDFLAGS="-fuse-ld=mold"
-          export DTC_FLAGS="-@"
 
-          MOD_VER=$(git rev-parse --short HEAD)
-          BUILD_ARGS="LOCALVERSION=-nethunter-a14-${MOD_VER} KBUILD_BUILD_USER=opencode KBUILD_BUILD_HOST=ci O=out"
-
-          # Configure
           make -C . O=out ARCH=arm64 LLVM=1 CC=clang \
             CROSS_COMPILE=${CROSS_COMPILE} \
-            exynos850-nethunter_defconfig
+            a14noavbp_defconfig
 
-          # CFI is supported with clang r450784d (same as original kernel)
-          # Keep whatever the defconfig specified
-
-          # Build kernel (Image + dtbs) - same as langsdorff
           make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
             CROSS_COMPILE=${CROSS_COMPILE} \
-            LDFLAGS="-fuse-ld=mold" \
-            ${BUILD_ARGS} Image dtbs
+            Image
 
-          # Also build modules (optional - may fail on signing)
-          make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
-            CROSS_COMPILE=${CROSS_COMPILE} \
-            LDFLAGS="-fuse-ld=mold" \
-            INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" \
-            INSTALL_MOD_PATH=$(pwd)/modules_out \
-            ${BUILD_ARGS} modules_install || echo "modules_install skipped (optional)"
-
-          echo "=== Build complete ==="
-          ls -lh out/arch/arm64/boot/Image
-
-      - name: Create boot.img
-        run: |
-          python3 kernel_build/mkbootimg/mkbootimg.py \
-            --header_version 4 \
-            --kernel out/arch/arm64/boot/Image \
-            --output boot.img \
-            --os_version 14.0.0 \
-            --os_patch_level 2025-04
-          ls -lh boot.img
-
-      - name: Upload boot.img
+      - name: Upload Image
         uses: actions/upload-artifact@v4
         with:
-          name: boot-nethunter
-          path: boot.img
-
-      - name: Package AnyKernel3
-        run: |
-          echo "=== Downloading AnyKernel3 ==="
-          git clone --depth 1 https://github.com/osm0sis/AnyKernel3 /tmp/anykernel
-
-          echo "=== Identifying DTBs ==="
-          DTB_DIR="out/arch/arm64/boot/dts"
-          find "$DTB_DIR" -name "*.dtb" 2>/dev/null | head -5 || echo "No dtb files found"
-
-          echo "=== Setting up AnyKernel3 ==="
-          # Copy kernel
-          cp out/arch/arm64/boot/Image /tmp/anykernel/
-          # Copy dtb(s) if they exist
-          for dtb in $(find "$DTB_DIR" -name "*.dtb" 2>/dev/null); do
-            cp "$dtb" /tmp/anykernel/
-          done
-          # Copy dtbo if it exists
-          cp out/arch/arm64/boot/dtbo.img /tmp/anykernel/ 2>/dev/null || true
-
-          echo "=== Configuring anykernel.sh ==="
-          printf '%s\n' \
-            '# AnyKernel3 - exynos850 (a13/a14/m14) - universal' \
-            'do.devicecheck=0' \
-            'do.modules=0' \
-            'do.cleanup=1' \
-            'block=/dev/block/by-name/boot;' \
-            'is_slot_device=auto;' \
-            'ramdisk_compression=auto;' \
-            '. tools/ak3-core.sh;' \
-            'split_boot;' \
-            'flash_boot;' \
-            > /tmp/anykernel/anykernel.sh
-
-          echo "=== Creating zip ==="
-          cd /tmp/anykernel
-          rm -rf .git README.md
-          zip -r9 /tmp/NetHunter-A14-AnyKernel3.zip * -x "*.git*"
-          ls -lh /tmp/NetHunter-A14-AnyKernel3.zip
-          cd -
-
-      - name: Upload AnyKernel3
-        uses: actions/upload-artifact@v4
-        with:
-          name: nethunter-anykernel3
-          path: /tmp/NetHunter-A14-AnyKernel3.zip
-
-      - name: Prepare full artifacts
-        run: |
-          mkdir -p output
-          cp out/arch/arm64/boot/Image output/
-          find . -path ./modules_out -prune -o -name "*.ko" -print -exec cp {} output/ \;
-          cp -r modules_out/lib/modules/* output/ 2>/dev/null || true
-          ls -lh output/
-
-      - name: Upload full artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: nethunter-kernel-a14-full
-          path: output/
+          name: Image
+          path: out/arch/arm64/boot/Image
