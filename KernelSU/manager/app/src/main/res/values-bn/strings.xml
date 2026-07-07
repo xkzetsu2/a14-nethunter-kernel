@@ -4,7 +4,7 @@
     <string name="home_not_installed">ইনস্টল করা হয়নি</string>
     <string name="home_click_to_install">ইনস্টল করার জন্য ক্লিক করুন</string>
     <string name="home_working"> ওয়ার্কিং</string>
-    <string name="home_working_version">ওয়ার্কিং সংস্করণ: %d</string>
+    <string name="home_working_version">ওয়ার্কিং সংস্করণ: %s</string>
     <string name="home_unsupported">অসমর্থিত</string>
     <string name="home_unsupported_reason">KernelSU শুধুমাত্র GKI কার্নেল সমর্থন করে</string>
     <string name="home_kernel">কার্নেল সংস্করণ</string>
@@ -65,10 +65,12 @@
     <string name="module_repos_source_code">সোর্স কোড</string>
     <string name="confirm">নিশ্চিত</string>
     <string name="metamodule_uninstall_confirm">আপনি কি নিশ্চিত আপনি মডিউল %s আনইনস্টল করতে চান? এটি সকল মডিউলকে প্রভাবিত করবে, এবং মেটামডিউল দ্বারা প্রদত্ত কিছু বৈশিষ্ট্য (যেমন মাউন্ট করা) আর কাজ করবে না।</string>
-    <string name="home_gki_warning">v3.0.0 থেকে শুরু করে, GKI মোড শুধুমাত্র নিরীক্ষণ এর জন্য ব্যবহার করা যাবে। আমরা দৈনন্দিন ব্যবহারের জন্য এটি সুপারিশ করি না, এবং ইমেজ ফাইল আর প্রদান করা হবে না।</string>
     <string name="failed_to_update_app_profile">%s এর জন্য অ্যাপ প্রোফাইল আপডেট করতে ব্যর্থ হয়েছে</string>
     <string name="settings_sucompat">su বাইনারি রি-রুট করুন</string>
     <string name="settings_sucompat_summary">অ্যাপ প্রোফাইলে সুপার ইউজার অনুমতি প্রাপ্ত অ্যাপগুলির জন্য /system/bin/su কে ksud এ রিডাইরেক্ট করুন; শুধুমাত্র নতুন প্রসেসের জন্য কার্যকর।</string>
     <string name="settings_kernel_umount">কার্নেল আনমাউন্ট</string>
     <string name="settings_kernel_umount_summary">KernelSU দ্বারা নিয়ন্ত্রিত কার্নেল-লেভেল আনমাউন্ট আচরণ</string>
+    <string name="profile_flags_desc_no_new_privs">এই রুট প্রোফাইলের প্রেক্ষাপট থেকে KernelSU-এর মাধ্যমে আরও বিশেষাধিকার বৃদ্ধি রোধ করে।</string>
+    <string name="install_force_backup">স্টক ইমেজ হিসেবে ব্যাকআপ করুন</string>
+    <string name="install_force_backup_summary">অনুগ্রহ করে নিশ্চিত করুন যে আপনি যে boot ইমেজটি বেছে নিয়েছেন সেটি স্টক ইমেজ</string>
 </resources>

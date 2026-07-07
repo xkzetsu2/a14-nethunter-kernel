@@ -1,3 +1,5 @@
+#[cfg(target_arch = "aarch64")]
+use crate::kpm;
 use crate::module::{handle_updated_modules, prune_modules};
 use crate::utils::{is_safe_mode, switch_mnt_ns};
 use crate::{
@@ -6,7 +8,7 @@ use crate::{
 };
 use anyhow::{Context, Result};
 use libc::_exit;
-use log::{info, warn};
+use log::{error, info, warn};
 use prop_rs_android::resetprop::ResetProp;
 use prop_rs_android::sys_prop;
 use rustix::process::chdir;
@@ -14,6 +16,11 @@ use std::path::Path;
 use std::process::Command;
 
 pub fn on_post_data_fs() -> Result<()> {
+    if let Err(e) = ksucalls::ensure_uapi_version_matched() {
+        error!("{e:#}, skip on_post_fs_data");
+        return Ok(());
+    }
+
     ksucalls::report_post_fs_data();
 
     utils::umask(0);
@@ -67,6 +74,13 @@ pub fn on_post_data_fs() -> Result<()> {
         warn!("prune modules failed: {e}");
     }
 
+    // Refresh /metadata/watchdog/ksu/modules.rc so the next boot's kernel hook sees the
+    // current module set. Acts as a safety net when state was changed outside
+    // of ksud's normal mutation commands.
+    if let Err(e) = crate::module::regenerate_preinit_rc() {
+        warn!("regenerate preinit rc failed: {e}");
+    }
+
     if let Err(e) = restorecon::restorecon() {
         warn!("restorecon failed: {e}");
     }
@@ -87,6 +101,11 @@ pub fn on_post_data_fs() -> Result<()> {
         warn!("init features failed: {e}");
     }
 
+    #[cfg(target_arch = "aarch64")]
+    if let Err(e) = kpm::booted_load() {
+        warn!("KPM: Failed to start KPM watcher: {e}");
+    }
+
     // execute metamodule post-fs-data script first (priority)
     if let Err(e) = metamodule::exec_stage_script("post-fs-data", true) {
         warn!("exec metamodule post-fs-data script failed: {e}");
@@ -98,6 +117,12 @@ pub fn on_post_data_fs() -> Result<()> {
         warn!("exec post-fs-data scripts failed: {e}");
     }
 
+    // exec lua script on post-fs-data
+    #[cfg(all(target_os = "android", target_arch = "aarch64"))]
+    if let Err(e) = crate::module::exec_stage_lua("post-fs-data", true, "kernelsu") {
+        warn!("Failed to exec post-fs-data lua: {e}");
+    }
+
     // load system.prop
     if let Err(e) = crate::module::load_system_prop() {
         warn!("load system.prop failed: {e}");
@@ -106,6 +131,11 @@ pub fn on_post_data_fs() -> Result<()> {
     // execute metamodule mount script
     if let Err(e) = metamodule::exec_mount_script(module_dir) {
         warn!("execute metamodule mount failed: {e}");
+    }
+
+    // Load umount config and apply to kernel
+    if let Err(e) = crate::umount::load_umount_config() {
+        warn!("load umount config failed: {e}");
     }
 
     run_stage("post-mount", true);
@@ -141,14 +171,30 @@ pub fn run_stage(stage: &str, block: bool) {
     if let Err(e) = crate::module::exec_stage_script(stage, block) {
         warn!("Failed to exec {stage} scripts: {e}");
     }
+
+    // run lua stage script
+    #[cfg(all(target_os = "android", target_arch = "aarch64"))]
+    if let Err(e) = crate::module::exec_stage_lua(stage, block, "kernelsu") {
+        warn!("Failed to exec {stage} lua: {e}");
+    }
 }
 
 pub fn on_services() {
+    if let Err(e) = ksucalls::ensure_uapi_version_matched() {
+        error!("{e:#}, skip on_services");
+        return;
+    }
+
     info!("on_services triggered!");
     run_stage("service", false);
 }
 
 pub fn on_boot_completed() {
+    if let Err(e) = ksucalls::ensure_uapi_version_matched() {
+        error!("{e:#}, skip on_boot_completed");
+        return;
+    }
+
     ksucalls::report_boot_complete();
     info!("on_boot_completed triggered!");
 
@@ -162,6 +208,7 @@ const fn resetprop() -> ResetProp {
         persist_only: false,
         verbose: false,
         show_context: false,
+        rebuild: false,
     }
 }
 
@@ -223,6 +270,12 @@ fn catch_bootlog(logname: &str, command: &[&str]) -> Result<()> {
 }
 
 pub fn soft_reboot() -> Result<()> {
+    // check it avoid user click "soft_reboot" in manager when version mismatch
+    if let Err(e) = ksucalls::ensure_uapi_version_matched() {
+        error!("{e:#}, skip soft_reboot");
+        return Ok(());
+    }
+
     utils::daemonize_with(true, || -> Result<()> {
         switch_mnt_ns(1)?;
         chdir("/")?;

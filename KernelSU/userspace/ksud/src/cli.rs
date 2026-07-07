@@ -6,19 +6,24 @@ use android_logger::Config;
 use log::{LevelFilter, error, info};
 
 use crate::boot_patch::{BootPatchArgs, BootRestoreArgs};
+use crate::module::regenerate_preinit_rc;
+#[cfg(target_arch = "aarch64")]
+use crate::susfs;
 use crate::{
-    apk_sign, assets, debug, defs, init_event, ksucalls, module, module_config, sulog, utils,
+    apk_sign, assets, debug, defs, init_event, ksu_uapi, ksucalls, module, module_config, sulog,
+    umount, utils,
 };
 
 /// KernelSU userspace cli
 #[derive(Parser, Debug)]
-#[command(author, version = defs::VERSION_NAME, about, long_about = None)]
+#[command(author, version = defs::FULL_VERSION, about, long_about = None)]
 struct Args {
     #[command(subcommand)]
     command: Commands,
 }
 
 #[derive(clap::Subcommand, Debug)]
+#[allow(clippy::large_enum_variant)]
 enum Commands {
     /// Manage KernelSU modules
     Module {
@@ -45,22 +50,50 @@ enum Commands {
         #[arg(long, default_missing_value = "5555", num_args = 0..=1)]
         magica: Option<u16>,
 
+        /// Pass allow_shell=1 when loading kernelsu.ko
+        #[arg(long)]
+        allow_shell: bool,
+
         /// Restore adb properties after magica late-load
         #[arg(long)]
         post_magica: bool,
 
+        /// Specify kernel KMI version instead of auto-detection
+        #[arg(long)]
+        kmi: Option<String>,
+
         /// manager package name
-        #[arg(long, default_value_t = String::from("me.weishu.kernelsu"))]
+        #[arg(long, default_value_t = String::from(defs::DEFAULT_PACKAGE_NAME))]
         package_name: String,
+
+        /// kernel release string to spoof
+        #[arg(long)]
+        spoof_release: Option<String>,
+
+        /// kernel version string to spoof
+        #[arg(long)]
+        spoof_version: Option<String>,
     },
 
     /// Emulate system reboot
     SoftReboot,
 
+    /// Load a kernel module with kallsyms access
+    Insmod {
+        /// kernel module path
+        module: PathBuf,
+        /// module load parameters (e.g. key=val key2=val2)
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0..)]
+        params: Vec<String>,
+    },
+
     /// Install KernelSU userspace component to system
     Install {
         #[arg(long, default_value = None)]
-        magiskboot: Option<PathBuf>,
+        libadbroot: Option<PathBuf>,
+
+        #[arg(long, default_value = None)]
+        data_path: Option<PathBuf>,
     },
 
     /// Unload KernelSU kernel module (LKM Only)
@@ -68,11 +101,7 @@ enum Commands {
 
     /// Uninstall KernelSU modules and itself(LKM Only)
     Uninstall {
-        /// magiskboot path, if not specified, will search from $PATH
-        #[arg(long, default_value = None)]
-        magiskboot: Option<PathBuf>,
-
-        #[arg(long, default_value_t = String::from("me.weishu.kernelsu"))]
+        #[arg(long, default_value_t = String::from(defs::DEFAULT_PACKAGE_NAME))]
         package_name: String,
     },
 
@@ -105,11 +134,13 @@ enum Commands {
         #[command(subcommand)]
         command: BootInfo,
     },
+
     /// For developers
     Debug {
         #[command(subcommand)]
         command: Debug,
     },
+
     /// Kernel interface
     Kernel {
         #[command(subcommand)]
@@ -122,6 +153,32 @@ enum Commands {
         /// Arguments passed to resetprop
         #[arg(trailing_var_arg = true, allow_hyphen_values = true, num_args = 0..)]
         args: Vec<String>,
+    },
+
+    /// Manage initrc injection
+    Initrc {
+        #[command(subcommand)]
+        command: Initrc,
+    },
+
+    /// Manage kernel umount paths
+    Umount {
+        #[command(subcommand)]
+        command: Umount,
+    },
+
+    /// KPM module manager
+    #[cfg(target_arch = "aarch64")]
+    Kpm {
+        #[command(subcommand)]
+        command: kpm_cmd::Kpm,
+    },
+
+    #[cfg(target_arch = "aarch64")]
+    /// Susfs
+    Susfs {
+        #[command(subcommand)]
+        command: Susfs,
     },
 }
 
@@ -148,6 +205,9 @@ enum BootInfo {
         #[arg(short = 'u', long, default_value = "false")]
         ota: bool,
     },
+
+    /// read ksu_config from ramdisk
+    ReadConfig,
 }
 
 #[derive(clap::Subcommand, Debug)]
@@ -155,7 +215,7 @@ enum Debug {
     /// Set the manager app, kernel CONFIG_KSU_DEBUG should be enabled.
     SetManager {
         /// manager package name
-        #[arg(default_value_t = String::from("me.weishu.kernelsu"))]
+        #[arg(default_value_t = String::from(defs::DEFAULT_PACKAGE_NAME))]
         apk: String,
     },
 
@@ -186,12 +246,6 @@ enum Debug {
         path: PathBuf,
     },
 
-    /// Load a kernel module from disk
-    Insmod {
-        /// kernel module path
-        module: PathBuf,
-    },
-
     /// Process mark management
     Mark {
         #[command(subcommand)]
@@ -200,6 +254,12 @@ enum Debug {
 
     /// Launch sulogd daemon manually
     Sulogd,
+
+    /// Get kernel info
+    Info,
+
+    /// Print default package name
+    Package,
 }
 
 #[derive(clap::Subcommand, Debug)]
@@ -286,6 +346,15 @@ enum Module {
     Action {
         // module id
         id: String,
+    },
+
+    /// module lua runner
+    #[cfg(all(target_os = "android", target_arch = "aarch64"))]
+    Lua {
+        // module id
+        id: String,
+        // lua function
+        function: String,
     },
 
     /// list all modules
@@ -387,7 +456,7 @@ enum Profile {
 enum Feature {
     /// Get feature value and support status
     Get {
-        /// Feature ID or name (su_compat, kernel_umount)
+        /// Feature ID or name (su_compat, kernel_umount, sulog, adb_root, selinux_hide)
         id: String,
         /// Read from config file
         #[arg(long, default_value_t = false)]
@@ -407,7 +476,7 @@ enum Feature {
 
     /// Check feature status (supported/unsupported/managed)
     Check {
-        /// Feature ID or name (su_compat, kernel_umount)
+        /// Feature ID or name (su_compat, kernel_umount, sulog, adb_root, selinux_hide)
         id: String,
     },
 
@@ -432,6 +501,15 @@ enum Kernel {
     },
     /// Notify that module is mounted
     NotifyModuleMounted,
+    /// Spoof kernel release and version strings
+    SpoofUname {
+        /// kernel release string (e.g. 5.10.117-android12-9)
+        #[arg(short, long)]
+        release: Option<String>,
+        /// kernel version string (e.g. #1 SMP PREEMPT Mon May 19 2026)
+        #[arg(short, long)]
+        version: Option<String>,
+    },
 }
 
 #[derive(clap::Subcommand, Debug)]
@@ -451,6 +529,217 @@ enum UmountOp {
     },
     /// Wipe all entries from umount list
     Wipe,
+}
+
+#[derive(clap::Subcommand, Debug)]
+enum Initrc {
+    /// Regenerate preinit rc file
+    Refresh,
+}
+
+#[derive(clap::Subcommand, Debug)]
+enum Umount {
+    /// Add mount point to umount list
+    Add {
+        /// mount point path
+        mnt: String,
+        /// umount flags (default: 0, MNT_DETACH: 2)
+        #[arg(short, long, default_value = "0")]
+        flags: u32,
+    },
+    /// Remove mount point from umount list
+    Remove {
+        /// mount point path
+        mnt: String,
+    },
+    /// List all mount points in umount list
+    List,
+    /// Save current umount list to file
+    Save,
+    /// Apply saved umount list from file to kernel
+    Apply,
+    /// Clear custom umount paths (wipe kernel list)
+    ClearCustom,
+}
+
+#[cfg(target_arch = "aarch64")]
+mod kpm_cmd {
+    use clap::Subcommand;
+    use std::path::PathBuf;
+
+    #[derive(Subcommand, Debug)]
+    pub enum Kpm {
+        /// Load a KPM module: load <path> [args]
+        Load { path: PathBuf, args: Option<String> },
+        /// Unload a KPM module: unload <name>
+        Unload { name: String },
+        /// Get number of loaded modules
+        Num,
+        /// List loaded KPM modules
+        List,
+        /// Get info of a KPM module: info <name>
+        Info { name: String },
+        /// Send control command to a KPM module: control <name> <args>
+        Control { name: String, args: String },
+        /// Print KPM Loader version
+        Version,
+    }
+}
+
+#[cfg(target_arch = "aarch64")]
+#[derive(clap::Subcommand, Debug)]
+enum Susfs {
+    /// Get SUSFS Status
+    Status,
+    /// Get SUSFS Version
+    Version,
+    /// Get SUSFS Variant
+    Variant,
+    /// Get SUSFS enabled Features
+    Features,
+    /// Spoof kernel uname
+    SetUname {
+        /// kernel release string
+        release: String,
+        /// kernel version string
+        version: String,
+    },
+    /// Enable or disable SUSFS kernel log
+    EnableLog {
+        /// 0 to disable, 1 to enable
+        enabled: u32,
+    },
+    /// Enable or disable AVC log spoofing
+    EnableAvcLogSpoofing {
+        /// 0 to disable, 1 to enable
+        enabled: u32,
+    },
+    /// Hide SUS mounts for non-su processes
+    HideSusMntsForNonSuProcs {
+        /// 0 to disable, 1 to enable
+        enabled: u32,
+    },
+    /// Add open redirect
+    AddOpenRedirect {
+        /// target path
+        target: String,
+        /// redirected path
+        redirected: String,
+        /// uid scheme
+        uid_scheme: u32,
+    },
+    /// Add SUS map
+    AddSusMap {
+        /// library path
+        path: String,
+    },
+    /// Add SUS path
+    AddSusPath {
+        /// path to add
+        path: String,
+    },
+    /// Add SUS loop path
+    AddSusPathLoop {
+        /// path to add
+        path: String,
+    },
+    /// Add SUS kstat
+    AddSusKstat {
+        /// path to add
+        path: String,
+    },
+    /// Update SUS kstat
+    UpdateSusKstat {
+        /// path to update
+        path: String,
+    },
+    /// Update SUS kstat full clone
+    UpdateSusKstatFullClone {
+        /// path to update
+        path: String,
+    },
+    /// Add SUS kstat statically
+    AddSusKstatStatically {
+        /// path
+        path: String,
+        /// ino
+        ino: u64,
+        /// dev
+        dev: u64,
+        /// nlink
+        nlink: u32,
+        /// size
+        size: u64,
+        /// atime sec
+        atime_sec: i64,
+        /// atime nsec
+        atime_nsec: u64,
+        /// mtime sec
+        mtime_sec: i64,
+        /// mtime nsec
+        mtime_nsec: u64,
+        /// ctime sec
+        ctime_sec: i64,
+        /// ctime nsec
+        ctime_nsec: u64,
+        /// blocks
+        blocks: u64,
+        /// blksize
+        blksize: i64,
+    },
+    /// Manage the SuSFS Magisk auto-start module
+    Module {
+        #[cfg(target_arch = "aarch64")]
+        #[clap(subcommand)]
+        command: SusfsModuleCmd,
+    },
+    /// Manage SuSFS persistent configuration
+    Config {
+        #[cfg(target_arch = "aarch64")]
+        #[clap(subcommand)]
+        command: SusfsConfigCmd,
+    },
+}
+
+/// susfs module subcommands
+#[cfg(target_arch = "aarch64")]
+#[derive(clap::Subcommand, Debug)]
+pub enum SusfsModuleCmd {
+    /// Install (or reinstall) the SuSFS auto-start module from saved config
+    Install,
+    /// Remove the SuSFS auto-start module
+    Remove,
+    /// Check if the module is installed
+    Status,
+}
+
+/// susfs config subcommands
+#[cfg(target_arch = "aarch64")]
+#[derive(clap::Subcommand, Debug)]
+pub enum SusfsConfigCmd {
+    /// Get a config value by key
+    Get {
+        /// Config key (e.g. sus_paths, enable_log)
+        key: String,
+    },
+    /// Set a config value
+    Set {
+        /// Config key
+        key: String,
+        /// Config value (use empty string to clear a multi-value key)
+        value: String,
+    },
+    /// Remove a config key
+    Remove {
+        /// Config key
+        key: String,
+    },
+    /// Clear all config values
+    Clear,
+    /// Reset all config keys to defaults
+    Reset,
+    /// List all config key=value pairs (one per line)
+    List,
 }
 
 pub fn run() -> Result<()> {
@@ -484,6 +773,8 @@ pub fn run() -> Result<()> {
 
         Commands::SoftReboot => init_event::soft_reboot(),
 
+        Commands::Insmod { module, params } => debug::insmod(&module, &params),
+
         Commands::Module { command } => {
             utils::switch_mnt_ns(1)?;
             match command {
@@ -493,6 +784,10 @@ pub fn run() -> Result<()> {
                 Module::Enable { id } => module::enable_module(&id),
                 Module::Disable { id } => module::disable_module(&id),
                 Module::Action { id } => module::run_action(&id),
+                #[cfg(all(target_os = "android", target_arch = "aarch64"))]
+                Module::Lua { id, function } => {
+                    module::run_lua(&id, &function, false, true).map_err(|e| anyhow::anyhow!("{e}"))
+                }
                 Module::List => module::list_modules(),
                 Module::Config { internal, command } => {
                     let module_id = match internal {
@@ -586,12 +881,12 @@ pub fn run() -> Result<()> {
                 }
             }
         }
-        Commands::Install { magiskboot } => utils::install(magiskboot),
+        Commands::Install {
+            libadbroot,
+            data_path,
+        } => utils::install(libadbroot, data_path),
         Commands::Unload => crate::unload::unload(),
-        Commands::Uninstall {
-            magiskboot,
-            package_name,
-        } => utils::uninstall(magiskboot, &package_name),
+        Commands::Uninstall { package_name } => utils::uninstall(&package_name),
         Commands::Sepolicy { command } => match command {
             Sepolicy::Patch { sepolicy } => crate::sepolicy::live_patch(&sepolicy),
             Sepolicy::Apply { file } => crate::sepolicy::apply_file(file),
@@ -599,16 +894,26 @@ pub fn run() -> Result<()> {
         },
         Commands::LateLoad {
             magica,
+            allow_shell,
             post_magica,
+            kmi,
             package_name,
+            spoof_release,
+            spoof_version,
         } => {
             if let Some(port) = magica {
-                return crate::magica::run(port, &package_name).map_err(|e| {
+                return crate::magica::run(port, &package_name, allow_shell).map_err(|e| {
                     error!("Error running magica: {e}");
                     e
                 });
             }
-            let result = crate::late_load::run(&package_name);
+            let result = crate::late_load::run(
+                &package_name,
+                kmi,
+                allow_shell,
+                spoof_release.as_ref(),
+                spoof_version.as_ref(),
+            );
             if post_magica {
                 info!("Restoring adb properties (post-magica cleanup)...");
                 if let Err(e) = crate::magica::disable_adb_root() {
@@ -672,7 +977,6 @@ pub fn run() -> Result<()> {
                 let data = assets::get_asset_data(&name)?;
                 utils::ensure_binary(&path, &data, false)
             }
-            Debug::Insmod { module } => debug::insmod(&module),
             Debug::Mark { command } => match command {
                 MarkCommand::Get { pid } => debug::mark_get(pid),
                 MarkCommand::Mark { pid } => debug::mark_set(pid),
@@ -680,6 +984,25 @@ pub fn run() -> Result<()> {
                 MarkCommand::Refresh => debug::mark_refresh(),
             },
             Debug::Sulogd => sulog::ensure_sulogd_running(),
+            Debug::Info => {
+                let info = ksucalls::get_info();
+                println!("version: {}", info.version);
+                println!("flags: 0x{:x}", info.flags);
+                println!("uapi_version: {}", info.uapi_version);
+                println!("features: 0x{:x}", info.features);
+                println!("lkm: {}", ksucalls::is_lkm());
+                println!("late_load: {}", ksucalls::is_late_load());
+                println!("runtime_mode: {}", ksucalls::runtime_mode());
+                println!(
+                    "pr_build: {}",
+                    (info.flags & ksu_uapi::KSU_GET_INFO_FLAG_PR_BUILD) != 0
+                );
+                Ok(())
+            }
+            Debug::Package => {
+                println!("{}", defs::DEFAULT_PACKAGE_NAME);
+                Ok(())
+            }
         },
 
         Commands::BootPatch(boot_patch) => crate::boot_patch::patch(boot_patch),
@@ -723,6 +1046,13 @@ pub fn run() -> Result<()> {
                 }
                 return Ok(());
             }
+            BootInfo::ReadConfig => {
+                let config = crate::boot_patch::read_ksu_config()?;
+                for line in &config {
+                    println!("{line}");
+                }
+                return Ok(());
+            }
         },
         Commands::BootRestore(boot_restore) => crate::boot_patch::restore(boot_restore),
         Commands::Resetprop { args } => {
@@ -742,7 +1072,163 @@ pub fn run() -> Result<()> {
                 ksucalls::report_module_mounted();
                 Ok(())
             }
+            Kernel::SpoofUname { release, version } => {
+                let r = release.unwrap_or_default();
+                let v = version.unwrap_or_default();
+                ksucalls::set_spoof_version(&r, &v)
+            }
         },
+        Commands::Initrc { command } => match command {
+            Initrc::Refresh => regenerate_preinit_rc(),
+        },
+        Commands::Umount { command } => match command {
+            Umount::Add { mnt, flags } => ksucalls::umount_list_add(&mnt, flags),
+            Umount::Remove { mnt } => umount::remove_umount_entry_from_config(&mnt),
+            Umount::List => {
+                let list = ksucalls::umount_list_list()?;
+                print!("{list}");
+                Ok(())
+            }
+            Umount::Save => umount::save_umount_config(),
+            Umount::Apply => umount::apply_umount_config(),
+            Umount::ClearCustom => umount::clear_umount_config(),
+        },
+        #[cfg(target_arch = "aarch64")]
+        Commands::Kpm { command } => {
+            use crate::cli::kpm_cmd::Kpm;
+            match command {
+                Kpm::Load { path, args } => {
+                    crate::kpm::load_module(path.to_str().unwrap(), args.as_deref())
+                }
+                Kpm::Unload { name } => crate::kpm::unload_module(name),
+                Kpm::Num => crate::kpm::num().map(|_| ()),
+                Kpm::List => crate::kpm::list(),
+                Kpm::Info { name } => crate::kpm::info(name),
+                Kpm::Control { name, args } => {
+                    let ret = crate::kpm::control(name, args)?;
+                    println!("{ret}");
+                    Ok(())
+                }
+                Kpm::Version => crate::kpm::version(),
+            }
+        }
+        #[cfg(target_arch = "aarch64")]
+        Commands::Susfs { command } => {
+            let _ = match command {
+                Susfs::Status => {
+                    println!("{}", susfs::get_susfs_status());
+                    Ok(())
+                }
+                Susfs::Version => {
+                    println!("{}", susfs::get_susfs_version());
+                    Ok(())
+                }
+                Susfs::Variant => {
+                    println!("{}", susfs::get_susfs_variant());
+                    Ok(())
+                }
+                Susfs::Features => {
+                    println!("{}", susfs::get_susfs_features());
+                    Ok(())
+                }
+                Susfs::SetUname { release, version } => susfs::set_uname(&release, &version),
+                Susfs::EnableLog { enabled } => susfs::enable_log(enabled != 0),
+                Susfs::EnableAvcLogSpoofing { enabled } => {
+                    susfs::enable_avc_log_spoofing(enabled != 0)
+                }
+                Susfs::HideSusMntsForNonSuProcs { enabled } => {
+                    susfs::hide_sus_mnts_for_non_su_procs(enabled != 0)
+                }
+                Susfs::AddOpenRedirect {
+                    target,
+                    redirected,
+                    uid_scheme,
+                } => susfs::add_open_redirect(&target, &redirected, uid_scheme),
+                Susfs::AddSusMap { path } => susfs::add_sus_map(&path),
+                Susfs::AddSusPath { path } => susfs::add_sus_path(&path),
+                Susfs::AddSusPathLoop { path } => susfs::add_sus_path_loop(&path),
+                Susfs::AddSusKstat { path } => susfs::add_sus_kstat(&path),
+                Susfs::UpdateSusKstat { path } => susfs::update_sus_kstat(&path),
+                Susfs::UpdateSusKstatFullClone { path } => {
+                    susfs::update_sus_kstat_full_clone(&path)
+                }
+                Susfs::AddSusKstatStatically {
+                    path,
+                    ino,
+                    dev,
+                    nlink,
+                    size,
+                    atime_sec,
+                    atime_nsec,
+                    mtime_sec,
+                    mtime_nsec,
+                    ctime_sec,
+                    ctime_nsec,
+                    blocks,
+                    blksize,
+                } => susfs::add_sus_kstat_statically(
+                    &path, ino, dev, nlink, size, atime_sec, atime_nsec, mtime_sec, mtime_nsec,
+                    ctime_sec, ctime_nsec, blocks, blksize,
+                ),
+                Susfs::Module { command } => {
+                    use crate::susfs_module;
+                    match command {
+                        SusfsModuleCmd::Install => {
+                            susfs_module::install_module()?;
+                            println!("SuSFS module installed successfully");
+                            Ok(())
+                        }
+                        SusfsModuleCmd::Remove => {
+                            susfs_module::remove_module()?;
+                            println!("SuSFS module removed successfully");
+                            Ok(())
+                        }
+                        SusfsModuleCmd::Status => {
+                            if susfs_module::is_module_installed() {
+                                println!("installed");
+                            } else {
+                                println!("not installed");
+                            }
+                            Ok(())
+                        }
+                    }
+                }
+                Susfs::Config { command } => {
+                    use crate::susfs_config;
+                    match command {
+                        SusfsConfigCmd::Get { key } => {
+                            println!("{}", susfs_config::get(&key)?);
+                            Ok(())
+                        }
+                        SusfsConfigCmd::Set { key, value } => {
+                            susfs_config::set(&key, &value)?;
+                            println!("ok");
+                            Ok(())
+                        }
+                        SusfsConfigCmd::Remove { key } => {
+                            susfs_config::remove(&key)?;
+                            println!("ok");
+                            Ok(())
+                        }
+                        SusfsConfigCmd::Clear => {
+                            susfs_config::clear()?;
+                            println!("ok");
+                            Ok(())
+                        }
+                        SusfsConfigCmd::Reset => {
+                            susfs_config::reset_to_defaults()?;
+                            println!("ok");
+                            Ok(())
+                        }
+                        SusfsConfigCmd::List => {
+                            println!("{}", susfs_config::export_json()?);
+                            Ok(())
+                        }
+                    }
+                }
+            };
+            Ok(())
+        }
     };
 
     if let Err(e) = &result {

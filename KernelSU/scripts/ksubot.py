@@ -2,7 +2,7 @@ import asyncio
 import os
 import sys
 from telethon import TelegramClient
-from telethon.tl.functions.help import GetConfigRequest
+from telethon.sessions import StringSession
 
 API_ID = 611335
 API_HASH = "d524b414d21f4d37f08684c1df41ac9c"
@@ -39,10 +39,7 @@ def get_caption():
         run_url=RUN_URL,
     )
     if len(msg) > 1024:
-        msg = COMMIT_URL
-    if BRANCH == "dev":
-        msg += "\n⚠️⚠️**DEV VERSION, PLEASE BACKUP BEFORE INSTALLATION**⚠️⚠️"
-        msg += "\n⚠️⚠️**测试版，安装前请备份**⚠️⚠️"
+        return COMMIT_URL
     return msg
 
 
@@ -55,7 +52,10 @@ def check_environ():
         print("[-] Invalid CHAT_ID")
         exit(1)
     else:
-        CHAT_ID = int(CHAT_ID)
+        try:
+            CHAT_ID = int(CHAT_ID)
+        except:
+            pass
     if COMMIT_URL is None:
         print("[-] Invalid COMMIT_URL")
         exit(1)
@@ -74,11 +74,14 @@ def check_environ():
     if BRANCH is None:
         print("[-] Invalid BRANCH")
         exit(1)
-    if MESSAGE_THREAD_ID is None:
-        print("[-] Invaild MESSAGE_THREAD_ID")
-        exit(1)
+    if MESSAGE_THREAD_ID and MESSAGE_THREAD_ID != "":
+        try:
+            MESSAGE_THREAD_ID = int(MESSAGE_THREAD_ID)
+        except:
+            print("[-] Invalid MESSAGE_THREAD_ID")
+            exit(1)
     else:
-        MESSAGE_THREAD_ID = int(MESSAGE_THREAD_ID)
+        MESSAGE_THREAD_ID = None
 
 
 async def main():
@@ -90,9 +93,7 @@ async def main():
         print("[-] No files to upload")
         exit(1)
     print("[+] Logging in Telegram with bot")
-    script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
-    session_dir = os.path.join(script_dir, "ksubot")
-    async with await TelegramClient(session=session_dir, api_id=API_ID, api_hash=API_HASH).start(bot_token=BOT_TOKEN) as bot:
+    async with await TelegramClient(StringSession(), API_ID, API_HASH).start(bot_token=BOT_TOKEN) as bot:
         caption = [""] * len(files)
         caption[-1] = get_caption()
         print("[+] Caption: ")

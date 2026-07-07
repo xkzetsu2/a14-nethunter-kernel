@@ -8,7 +8,15 @@
 #define KERNEL_SU_VERSION KSU_VERSION
 
 extern struct cred *ksu_cred;
+extern bool ksu_late_loaded;
 extern bool allow_shell;
+extern struct selinux_policy *backup_sepolicy;
+extern bool ksu_no_custom_rc;
+
+// SukiSU Ultra kernel su version full strings
+#ifndef KSU_VERSION_FULL
+#define KSU_VERSION_FULL "v3.x-00000000@unknown"
+#endif
 
 static inline int startswith(char *s, char *prefix)
 {

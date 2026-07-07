@@ -12,6 +12,10 @@
 
 #include "uapi/ksu.h"
 
+uint32_t get_kernel_uapi_version();
+
+uint32_t get_manager_uapi_version();
+
 uint32_t get_version();
 
 bool uid_should_umount(int uid);
@@ -42,14 +46,38 @@ bool set_kernel_umount_enabled(bool enabled);
 
 bool is_kernel_umount_enabled();
 
+// SELinux hide
+int set_selinux_hide_enabled(bool enabled);
+
+bool is_selinux_hide_enabled();
+
 bool get_allow_list(struct ksu_new_get_allow_list_cmd *);
+
+bool get_full_version(char* buff);
+bool get_hook_type(char *buff);
 
 inline std::pair<int, int> legacy_get_info() {
     int32_t version = -1;
     int32_t flags = 0;
     int32_t result = 0;
-    prctl(0xDEADBEEF, 2, &version, &flags, &result);
+    prctl(static_cast<int>(0xDEADBEEF), 2, &version, &flags, &result);
     return {version, flags};
 }
+
+#define DEFINE_CACHED_GETTER(name, ioctl, cmd_type, field, size) \
+    static char g_##name[size] = {0}; \
+    bool get_##name(char *buff) { \
+        if (g_##name[0] == '\0') { \
+            struct cmd_type cmd = {0}; \
+            if (ksuctl(ioctl, &cmd) == 0) { \
+                snprintf(g_##name, sizeof(g_##name), "%s", cmd.field); \
+            } \
+        } \
+        if (g_##name[0] != '\0') { \
+            snprintf(buff, size, "%s", g_##name); \
+            return true; \
+        } \
+        return false; \
+    }
 
 #endif //KERNELSU_KSU_H

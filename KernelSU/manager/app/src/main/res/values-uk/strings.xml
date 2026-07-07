@@ -4,7 +4,7 @@
     <string name="home_not_installed">Не встановлено</string>
     <string name="home_click_to_install">Натисніть щоб встановити</string>
     <string name="home_working">Працює</string>
-    <string name="home_working_version">Версія: %d</string>
+    <string name="home_working_version">Версія: %s</string>
     <string name="home_unsupported">Не підтримується</string>
     <string name="home_unsupported_reason">KernelSU зараз підтримує лише ядра GKI.</string>
     <string name="home_kernel">Версія ядра</string>
@@ -165,7 +165,6 @@
     <string name="module_repos">Репозиторій модулів</string>
     <string name="module_repos_sort_name">Ім\'я (А → Я)</string>
     <string name="module_repos_source_code">Вихідний код</string>
-    <string name="home_gki_warning">Починаючи з версії 3.0.0, робочий режим GKI використовуватиметься лише в тестових середовищах. Ми не рекомендуємо його для щоденного використання, а файли зображень більше не надаватимуться.</string>
     <string name="undo">Відмінити</string>
     <string name="module_undo_uninstall_success">Видалення %s успішно скасовано</string>
     <string name="module_undo_uninstall_failed">Не вдалося відмінити видалення: %s</string>
@@ -175,4 +174,7 @@
     <string name="tab_releases">Релізи</string>
     <string name="tab_info">Інформація</string>
     <string name="safe_mode_module_disabled">Встановлення модулів вимкнено в безпечному режимі</string>
+    <string name="profile_flags_desc_no_new_privs">Запобігає подальшому підвищенню привілеїв через KernelSU у контексті цього root-профілю.</string>
+    <string name="install_force_backup">Зберегти резервну копію як оригінальний образ</string>
+    <string name="install_force_backup_summary">Будь ласка, переконайтеся, що вибраний образ boot є оригінальним образом</string>
 </resources>

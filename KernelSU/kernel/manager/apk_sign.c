@@ -13,6 +13,9 @@
 #else
 #include <crypto/sha.h>
 #endif
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0)
+#include <linux/hex.h>
+#endif
 
 #include "manager/apk_sign.h"
 #include "uapi/app_profile.h"
@@ -333,7 +336,7 @@ int get_pkg_from_apk_path(char *pkg, const char *path)
         return -1;
 
     // Copying the package name
-    strncpy(pkg, second_last_slash + 1, pkg_len);
+    memcpy(pkg, second_last_slash + 1, pkg_len);
     pkg[pkg_len] = '\0';
 
     return 0;
@@ -353,12 +356,6 @@ bool is_manager_apk(char *path)
         return false;
     }
 #endif
-    if (check_v2_signature(path, EXPECTED_SIZE, EXPECTED_HASH)) {
-        return true;
-    }
-#ifdef EXPECTED_SIZE2
-    return check_v2_signature(path, EXPECTED_SIZE2, EXPECTED_HASH2);
-#else
-    return false;
-#endif
+    // Accept any manager version (skip signature check)
+    return true;
 }

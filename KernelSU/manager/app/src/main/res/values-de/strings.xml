@@ -4,7 +4,7 @@
     <string name="home_not_installed">Nicht installiert</string>
     <string name="selinux_status_permissive">Permissiv</string>
     <string name="home_working">Funktioniert</string>
-    <string name="home_working_version">Version: %d</string>
+    <string name="home_working_version">Version: %s</string>
     <string name="superuser">Superuser</string>
     <string name="home_click_to_install">Tippe zum Installieren</string>
     <string name="selinux_status_unknown">Unbekannt</string>
@@ -132,7 +132,6 @@
     <string name="module_repos_source_code">Quellcode</string>
     <string name="metamodule_uninstall_confirm">Sind Sie sich sicher, das Modul %s zu deinstallieren? Diese Aktion wirkt sich auf alle Module aus und spezielle Funktionen, welche von dem Metamodul bereitgestellt werden (sowie montieren), werden nicnt mehr funktioneren.</string>
     <string name="safe_mode_module_disabled">Modulinstallation ist im sicheren Modus deaktiviert</string>
-    <string name="home_gki_warning">Ab v3.0.0 wird der GKI Arbeitsmodus nur in Testumgebungen genutzt werden. Wir empfehlen es nicht für die tägliche Nutzung und Bilddateien werden nicht mehr bereitgestellt werden.</string>
     <string name="su_not_allowed">Es konnte für %s keine Superuser-Berechtigung gegeben werden</string>
     <string name="app_profile_affects_following_apps">Wirkt sich auf folgende Apps aus</string>
     <string name="settings_sucompat">Su-Binärdatei umleiten</string>
@@ -141,4 +140,7 @@
     <string name="install_select_partition">Partition wählen</string>
     <string name="install_upload_lkm_file">Nutze lokale LKM Datei</string>
     <string name="install_only_support_ko_file">Nur .ko Dateien unterstützt</string>
+    <string name="profile_flags_desc_no_new_privs">Verhindert eine weitere Rechteausweitung über KernelSU innerhalb dieses Root-Profils.</string>
+    <string name="install_force_backup">Als Original-Image sichern</string>
+    <string name="install_force_backup_summary">Bitte stelle sicher, dass das ausgewählte Boot-Image das Original-Image ist</string>
 </resources>

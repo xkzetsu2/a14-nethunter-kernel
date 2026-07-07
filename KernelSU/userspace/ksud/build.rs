@@ -1,8 +1,4 @@
-use std::env;
-use std::fs::File;
-use std::io::Write;
-use std::path::Path;
-use std::process::Command;
+use std::{env, process::Command};
 
 fn get_git_version() -> Result<(u32, String), std::io::Error> {
     let output = Command::new("git")
@@ -15,7 +11,7 @@ fn get_git_version() -> Result<(u32, String), std::io::Error> {
         .trim()
         .parse()
         .map_err(|_| std::io::Error::other("Failed to parse git count"))?;
-    let version_code = 30000 + version_code;
+    let version_code = 40000 - 2815 + version_code; // For historical reasons
 
     let version_name = String::from_utf8(
         Command::new("git")
@@ -23,7 +19,7 @@ fn get_git_version() -> Result<(u32, String), std::io::Error> {
             .output()?
             .stdout,
     )
-    .map_err(|_| std::io::Error::other("Failed to read git describe stdout"))?;
+    .map_err(|_| std::io::Error::other("Failed to parse git count"))?;
     let version_name = version_name.trim_start_matches('v').to_string();
     Ok((version_code, version_name))
 }
@@ -63,17 +59,11 @@ fn main() {
             (0, "0.0.0".to_string())
         }
     };
-    let out_dir = env::var("OUT_DIR").expect("Failed to get $OUT_DIR");
-    let out_dir = Path::new(&out_dir);
-    File::create(Path::new(out_dir).join("VERSION_CODE"))
-        .expect("Failed to create VERSION_CODE")
-        .write_all(code.to_string().as_bytes())
-        .expect("Failed to write VERSION_CODE");
-
-    File::create(Path::new(out_dir).join("VERSION_NAME"))
-        .expect("Failed to create VERSION_NAME")
-        .write_all(name.trim().as_bytes())
-        .expect("Failed to write VERSION_NAME");
+    if env::var("KSU_PACKAGE_NAME").is_err() {
+        println!("cargo:rustc-env=KSU_PACKAGE_NAME=com.sukisu.ultra");
+    }
+    println!("cargo:rustc-env=VERSION_CODE={code}");
+    println!("cargo:rustc-env=VERSION_NAME={name}");
 
     let target_os = env::var("CARGO_CFG_TARGET_OS").expect("CARGO_CFG_TARGET_OS not set");
     if target_os == "android" {

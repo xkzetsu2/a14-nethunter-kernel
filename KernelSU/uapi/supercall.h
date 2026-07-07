@@ -6,9 +6,13 @@
 
 #include "uapi/app_profile.h"
 
+// 2: allowlist v4 root profile flags
+static const __u32 KERNEL_SU_UAPI_VERSION = 2;
+
 /* Magic numbers for reboot hook to install fd */
 static const __u32 KSU_INSTALL_MAGIC1 = 0xDEADBEEF;
 static const __u32 KSU_INSTALL_MAGIC2 = 0xCAFEBABE;
+static const __u32 KSU_FULL_VERSION_STRING = 255;
 
 struct ksu_become_daemon_cmd {
     __u8 token[65]; /* Input: daemon token (null-terminated) */
@@ -24,6 +28,13 @@ static const __u32 KSU_GET_INFO_FLAG_LATE_LOAD = (1U << 2);
 static const __u32 KSU_GET_INFO_FLAG_PR_BUILD = (1U << 3);
 
 struct ksu_get_info_cmd {
+    __u32 version; /* Output: KERNEL_SU_VERSION */
+    __u32 flags; /* Output: KSU_GET_INFO_FLAG_* bits */
+    __u32 features; /* Output: max feature ID supported */
+    __u32 uapi_version; /* Output: KERNEL_SU_UAPI_VERSION */
+};
+
+struct ksu_get_info_legacy_cmd {
     __u32 version; /* Output: KERNEL_SU_VERSION */
     __u32 flags; /* Output: KSU_GET_INFO_FLAG_* bits */
     __u32 features; /* Output: max feature ID supported */
@@ -134,13 +145,54 @@ struct ksu_get_sulog_fd_cmd {
     __u32 flags; /* Input: reserved for future use, must be 0 */
 };
 
+struct ksu_set_spoof_version_cmd {
+    __u8 release[65]; /* Input: e.g., "5.10.115-android12-9-g00000000" */
+    __u8 version[65]; /* Input: e.g., "#1 SMP PREEMPT Thu Jan 1 00:00:00 UTC 2026" */
+};
+
+// List current umount entries
+struct ksu_list_try_umount_cmd {
+    __aligned_u64 arg; // User buffer
+    __u32 buf_size; // Buffer size provided by userspace
+};
+
 static const __u8 KSU_UMOUNT_WIPE = 0; /* ignore everything and wipe list */
 static const __u8 KSU_UMOUNT_ADD = 1; /* add entry (path + flags) */
 static const __u8 KSU_UMOUNT_DEL = 2; /* delete entry, strcmp */
 
+// Other command structures
+struct ksu_get_full_version_cmd {
+    char version_full[255]; // Output: full version string
+};
+
+struct ksu_hook_type_cmd {
+    char hook_type[32]; // Output: hook type string
+};
+
+struct ksu_enable_kpm_cmd {
+    __u8 enabled; // Output: true if KPM is enabled
+};
+
+static const __u32 SUKISU_KPM_LOAD = 1;
+static const __u32 SUKISU_KPM_UNLOAD = 2;
+static const __u32 SUKISU_KPM_NUM = 3;
+static const __u32 SUKISU_KPM_LIST = 4;
+static const __u32 SUKISU_KPM_INFO = 5;
+static const __u32 SUKISU_KPM_CONTROL = 6;
+static const __u32 SUKISU_KPM_VERSION = 7;
+
+struct ksu_kpm_cmd {
+    __aligned_u64 __user control_code;
+    __aligned_u64 __user arg1;
+    __aligned_u64 __user arg2;
+    __aligned_u64 __user result_code;
+};
+
 /* IOCTL command definitions */
 static const __u32 KSU_IOCTL_GRANT_ROOT = _IOC(_IOC_NONE, 'K', 1, 0);
-static const __u32 KSU_IOCTL_GET_INFO = _IOC(_IOC_READ, 'K', 2, 0);
+static const __u32 KSU_IOCTL_GET_INFO = _IOR('K', 2, struct ksu_get_info_cmd);
+/* deprecated */
+static const __u32 KSU_IOCTL_GET_INFO_LEGACY = _IOC(_IOC_READ, 'K', 2, 0);
 static const __u32 KSU_IOCTL_REPORT_EVENT = _IOC(_IOC_WRITE, 'K', 3, 0);
 static const __u32 KSU_IOCTL_SET_SEPOLICY = _IOC(_IOC_READ | _IOC_WRITE, 'K', 4, 0);
 static const __u32 KSU_IOCTL_CHECK_SAFEMODE = _IOC(_IOC_READ, 'K', 5, 0);
@@ -163,5 +215,13 @@ static const __u32 KSU_IOCTL_NUKE_EXT4_SYSFS = _IOC(_IOC_WRITE, 'K', 17, 0);
 static const __u32 KSU_IOCTL_ADD_TRY_UMOUNT = _IOC(_IOC_WRITE, 'K', 18, 0);
 static const __u32 KSU_IOCTL_SET_INIT_PGRP = _IO('K', 19);
 static const __u32 KSU_IOCTL_GET_SULOG_FD = _IOW('K', 20, struct ksu_get_sulog_fd_cmd);
+static const __u32 KSU_IOCTL_DISABLE_ESCAPE_TO_ROOT = _IO('K', 21);
+// Other IOCTL command definitions
+static const __u32 KSU_IOCTL_GET_FULL_VERSION = _IOC(_IOC_READ, 'K', 100, 0);
+static const __u32 KSU_IOCTL_HOOK_TYPE = _IOC(_IOC_READ, 'K', 101, 0);
+static const __u32 KSU_IOCTL_ENABLE_KPM = _IOC(_IOC_READ, 'K', 102, 0);
+static const __u32 KSU_IOCTL_LIST_TRY_UMOUNT = _IOC(_IOC_READ | _IOC_WRITE, 'K', 103, 0);
+static const __u32 KSU_IOCTL_SET_SPOOF_VERSION = _IOC(_IOC_WRITE, 'K', 104, 0);
+static const __u32 KSU_IOCTL_KPM = _IOC(_IOC_READ | _IOC_WRITE, 'K', 200, 0);
 
 #endif

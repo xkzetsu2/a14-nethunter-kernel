@@ -1,0 +1,83 @@
+name: Build SukiSU-Ultra Kernel
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ sukisu ]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup system tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq bc bison flex libssl-dev libelf-dev python3 \
+            gcc-aarch64-linux-gnu mold lz4 brotli cpio xz-utils dwarves
+
+      - name: Download AOSP clang r450784d (Droidian mirror)
+        run: |
+          set -e
+          CLANG_DEST="/tmp/aosp-clang"
+          mkdir -p "$CLANG_DEST"
+          git clone --depth 1 --filter=blob:none --sparse \
+            "https://github.com/droidian/android-platform-prebuilts-clang-host-linux-x86-33" \
+            /tmp/aosp-clang-repo
+          cd /tmp/aosp-clang-repo
+          git sparse-checkout set clang-r450784d llvm-binutils-stable
+          git checkout
+          mv clang-r450784d/* "$CLANG_DEST/" 2>/dev/null || true
+          cp -r llvm-binutils-stable/* "$CLANG_DEST/" 2>/dev/null || true
+          cd /
+          rm -rf /tmp/aosp-clang-repo
+          find "$CLANG_DEST" -name '*.split??' -type f | sed 's/\.split[0-9][0-9]$//' | sort -u | while read base; do
+            parts=$(ls "${base}.split"?? 2>/dev/null | sort)
+            if [ -n "$parts" ]; then
+              cat $parts > "$base"
+              chmod +x "$base" 2>/dev/null || true
+              rm -f ${base}.split??
+            fi
+          done
+          rm -f "$CLANG_DEST/bin/clang.real"
+          ln -sf clang-14 "$CLANG_DEST/bin/clang.real"
+          rm -f "$CLANG_DEST/bin/clang++.real"
+          ln -sf clang-14 "$CLANG_DEST/bin/clang++.real"
+
+      - name: Clean build tree
+        run: |
+          rm -rf include/config include/generated arch/arm64/include/generated .config
+          git clean -xdf -e include/config -e include/generated -e arch/arm64/include/generated 2>/dev/null || true
+          rm -rf out modules_out
+
+      - name: Build kernel
+        run: |
+          CLANG_DIR="/tmp/aosp-clang"
+          export CC="${CLANG_DIR}/bin/clang"
+          export PATH="${CLANG_DIR}/bin:$PATH"
+          export LLVM=1
+          export ARCH=arm64
+          if [ -f "${CLANG_DIR}/bin/aarch64-linux-gnu-objdump" ]; then
+            export CROSS_COMPILE="${CLANG_DIR}/bin/aarch64-linux-gnu-"
+          else
+            export CROSS_COMPILE="aarch64-linux-gnu-"
+          fi
+          make -C . O=out ARCH=arm64 LLVM=1 CC=clang \
+            CROSS_COMPILE=${CROSS_COMPILE} \
+            a14noavbp_defconfig
+          make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
+            CROSS_COMPILE=${CROSS_COMPILE} \
+            KSU_VERSION=32525 \
+            KSU_MANAGER_PACKAGE="me.weishu.kernelsu" \
+            Image
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-sukisu
+          path: |
+            out/arch/arm64/boot/Image
