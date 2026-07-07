@@ -80,15 +80,10 @@ jobs:
             CROSS_COMPILE=${CROSS_COMPILE} \
             KSU_VERSION=32525 \
             KSU_MANAGER_PACKAGE=\"me.weishu.kernelsu\" \
-            Image modules
+            Image
 
-          mkdir -p modules_out
-          find out -name "*.ko" -path "*/KernelSU/*" -exec cp {} modules_out/ \;
-
-      - name: Upload artifacts
+      - name: Upload Image
         uses: actions/upload-artifact@v4
         with:
-          name: kernel-artifacts
-          path: |
-            out/arch/arm64/boot/Image
-            modules_out/kernelsu.ko
+          name: Image
+          path: out/arch/arm64/boot/Image
