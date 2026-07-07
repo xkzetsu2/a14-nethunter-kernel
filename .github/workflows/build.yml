@@ -79,7 +79,6 @@ jobs:
           make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
             CROSS_COMPILE=${CROSS_COMPILE} \
             KSU_VERSION=32525 \
-            KSU_MANAGER_PACKAGE=\"me.weishu.kernelsu\" \
             Image modules
 
           mkdir -p modules_out
