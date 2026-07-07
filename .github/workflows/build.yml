@@ -78,7 +78,7 @@ jobs:
 
           make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
             CROSS_COMPILE=${CROSS_COMPILE} \
-            KSU_VERSION=40201 \
+            KSU_VERSION=40796 \
             Image
 
       - name: Upload Image
