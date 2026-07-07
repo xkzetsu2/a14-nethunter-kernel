@@ -79,10 +79,7 @@ jobs:
           make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
             CROSS_COMPILE=${CROSS_COMPILE} \
             KSU_VERSION=32525 \
-            Image modules
-
-          mkdir -p modules_out
-          find out -name "*.ko" -path "*/KernelSU/*" -exec cp {} modules_out/ \;
+            Image
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -90,4 +87,3 @@ jobs:
           name: kernel-artifacts
           path: |
             out/arch/arm64/boot/Image
-            modules_out/kernelsu.ko
