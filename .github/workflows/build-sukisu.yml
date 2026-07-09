@@ -73,22 +73,11 @@ jobs:
             CROSS_COMPILE=${CROSS_COMPILE} \
             KSU_VERSION=32525 \
             KSU_MANAGER_PACKAGE="me.weishu.kernelsu" \
-            Image modules
-          make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
-            CROSS_COMPILE=${CROSS_COMPILE} \
-            INSTALL_MOD_PATH=modules_out \
-            modules_install
-
-      - name: Collect artifacts
-        run: |
-          mkdir -p /tmp/artifacts
-          cp out/arch/arm64/boot/Image /tmp/artifacts/
-          find out -name "*.ko" -path "*/kernel/kernelsu/*" -exec cp {} /tmp/artifacts/ \; 2>/dev/null || true
-          find modules_out -name "*.ko" -exec cp {} /tmp/artifacts/ \; 2>/dev/null || true
-          ls -lh /tmp/artifacts/
+            Image
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: kernel-sukisu-lkm
-          path: /tmp/artifacts/*
+          name: kernel-sukisu
+          path: |
+            out/arch/arm64/boot/Image
