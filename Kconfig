@@ -19,8 +19,6 @@ source "net/Kconfig"
 
 source "drivers/Kconfig"
 
-source "KernelSU/kernel/Kconfig"
-
 source "fs/Kconfig"
 
 source "security/Kconfig"
