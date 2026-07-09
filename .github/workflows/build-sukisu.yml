@@ -3,7 +3,7 @@ name: Build SukiSU-Ultra Kernel
 on:
   workflow_dispatch:
   push:
-    branches: [ sukisu ]
+    branches: [ sukisu, xkzetsu2 ]
 
 jobs:
   build:
