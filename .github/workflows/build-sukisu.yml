@@ -69,6 +69,8 @@ jobs:
           make -C . O=out ARCH=arm64 LLVM=1 CC=clang \
             CROSS_COMPILE=${CROSS_COMPILE} \
             a14noavbp_defconfig
+          # Remove '+' suffix from kernel version
+          touch .scmversion
           make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
             CROSS_COMPILE=${CROSS_COMPILE} \
             Image
