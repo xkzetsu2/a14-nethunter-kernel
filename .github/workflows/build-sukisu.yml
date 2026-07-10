@@ -74,6 +74,11 @@ jobs:
             KSU_VERSION=32525 \
             KSU_MANAGER_PACKAGE="me.weishu.kernelsu" \
             Image
+          make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
+            CROSS_COMPILE=${CROSS_COMPILE} \
+            KSU_VERSION=32525 \
+            KSU_MANAGER_PACKAGE="me.weishu.kernelsu" \
+            modules
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -81,3 +86,4 @@ jobs:
           name: kernel-sukisu
           path: |
             out/arch/arm64/boot/Image
+            out/drivers/kernelsu/kernelsu.ko

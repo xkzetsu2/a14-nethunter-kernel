@@ -30,7 +30,8 @@ CONFIG_LOCALVERSION="-langsdorff@3.5e"
 # CONFIG_LOCALVERSION_AUTO is not set
 
 # KernelSU: Loadable Kernel Module (LKM) mode
-# CONFIG_KSU is not set - use external KernelSU LKM module
+CONFIG_KSU=m
+CONFIG_KSU_MANUAL_SU=m
 CONFIG_KPM=y
 CONFIG_BUILD_SALT=""
 CONFIG_DEFAULT_INIT=""
