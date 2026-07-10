@@ -74,19 +74,13 @@ jobs:
             KSU_VERSION=32525 \
             KSU_MANAGER_PACKAGE="me.weishu.kernelsu" \
             Image
-          # Enable KSU as module for LKM build, then restore
-          sed -i 's/# CONFIG_KSU is not set/CONFIG_KSU=m/' out/.config 2>/dev/null || true
-          grep -q "^CONFIG_KSU=m" out/.config || echo "CONFIG_KSU=m" >> out/.config
-          make -C . O=out ARCH=arm64 LLVM=1 CC=clang \
-            CROSS_COMPILE=${CROSS_COMPILE} \
-            olddefconfig
+          # Build kernelsu.ko as external module (Kbuild forces obj-m when KBUILD_EXTMOD)
           make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
             CROSS_COMPILE=${CROSS_COMPILE} \
             KSU_VERSION=32525 \
             KSU_MANAGER_PACKAGE="me.weishu.kernelsu" \
             KBUILD_MODPOST_WARN=1 \
             M=drivers/kernelsu modules
-          sed -i 's/^CONFIG_KSU=m.*$/# CONFIG_KSU is not set/' out/.config
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

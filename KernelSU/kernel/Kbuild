@@ -80,7 +80,11 @@ endif
 
 ccflags-y += -I$(KSU_KERNEL_DIR) -I$(KSU_KERNEL_DIR)/include
 
+ifdef KBUILD_EXTMOD
+obj-m += kernelsu.o
+else
 obj-$(CONFIG_KSU) += kernelsu.o
+endif
 
 MDIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
