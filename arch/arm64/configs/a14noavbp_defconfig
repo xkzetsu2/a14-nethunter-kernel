@@ -29,8 +29,9 @@ CONFIG_WERROR=y
 CONFIG_LOCALVERSION="-langsdorff@3.5e"
 # CONFIG_LOCALVERSION_AUTO is not set
 
-# KernelSU: Loadable Kernel Module (LKM) mode - module built separately
-# CONFIG_KSU is not set - kernel is clean, module built with KBUILD_MODPOST_WARN=1
+# KernelSU: built-in GKI (for projects)
+CONFIG_KSU=y
+CONFIG_KSU_MANUAL_SU=y
 CONFIG_KPM=y
 CONFIG_BUILD_SALT=""
 CONFIG_DEFAULT_INIT=""
