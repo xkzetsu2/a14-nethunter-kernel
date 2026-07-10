@@ -78,7 +78,8 @@ jobs:
             CROSS_COMPILE=${CROSS_COMPILE} \
             KSU_VERSION=32525 \
             KSU_MANAGER_PACKAGE="me.weishu.kernelsu" \
-            modules
+            KBUILD_MODPOST_WARN=1 \
+            M=drivers/kernelsu modules
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
