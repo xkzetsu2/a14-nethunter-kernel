@@ -29,9 +29,8 @@ CONFIG_WERROR=y
 CONFIG_LOCALVERSION="-langsdorff@3.5e"
 # CONFIG_LOCALVERSION_AUTO is not set
 
-# SukiSU-Ultra: Kernel-level root (built-in)
-CONFIG_KSU=y
-CONFIG_KSU_MANUAL_SU=y
+# KernelSU: Loadable Kernel Module (LKM) mode
+# CONFIG_KSU is not set - use external KernelSU LKM module
 CONFIG_KPM=y
 CONFIG_BUILD_SALT=""
 CONFIG_DEFAULT_INIT=""
