@@ -12,7 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Setup system tools
         run: |
@@ -71,8 +71,6 @@ jobs:
             a14noavbp_defconfig
           make -j$(nproc) -C . O=out ARCH=arm64 LLVM=1 CC=clang \
             CROSS_COMPILE=${CROSS_COMPILE} \
-            KSU_VERSION=32525 \
-            KSU_MANAGER_PACKAGE="me.weishu.kernelsu" \
             Image
 
       - name: Upload artifacts
