@@ -3825,13 +3825,13 @@ int32_t nvt_ts_suspend(struct device *dev)
 	if ((!ts->prox_power_off && ts->ear_detect_mode) && ts->prox_in_aot)
 		enter_force_ed_mode = 0;	// for prox in aot feature
 
-	if ((ts->lowpower_mode || ts->lcdoff_test) && enter_force_ed_mode == 0) {
-		nvt_ts_set_lp_mode(ts);
-	} else if (ts->ear_detect_mode) {
+	/* GSI fix: skip LP_MODE to ensure touch works on lockscreen */
+	if (ts->ear_detect_mode) {
 		nvt_ts_set_ed_mode(ts);
 	} else {
 		nvt_ts_set_icoff_mode(ts);
 	}
+	ts->lowpower_mode = false;
 
 #if SEC_LPWG_DUMP
 	if (ts->power_status == LP_MODE_STATUS) {
