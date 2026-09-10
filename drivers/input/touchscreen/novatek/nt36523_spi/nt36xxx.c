@@ -3274,6 +3274,8 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 		device_init_wakeup(&ts->input_dev->dev, 1);
 
 	ret = nvt_ts_fw_update_on_probe();
+	ts->sec_function |= HIGH_SENSITIVITY_MASK;
+	nvt_ts_mode_switch(ts, HIGH_SENSITIVITY_ENTER, true);
 	if (ret) {
 		input_err(true, &client->dev,"nvt_ts_fw_update_on_probe failed. ret(%d)\n", ret);
 		goto err_fw_update_failed;
