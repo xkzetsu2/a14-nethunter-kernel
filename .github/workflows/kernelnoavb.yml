@@ -24,7 +24,12 @@ jobs:
     - uses: rui314/setup-mold@v1
     - name: Build
       run: |
-        XY_TAG=$(git describe --tags --abbrev=0 origin/main) bash buildnoavb.sh
+        XY_TAG=$(git describe --tags --abbrev=0 origin/main)
+        # Limpeza total + reconfiguração para evitar estado sujo de build
+        cd "$1"
+        make mrproper >/dev/null 2>&1
+        make -s LLVM=1 O=out $BUILD_ARGS a14noavb_defconfig >/dev/null 2>&1
+        bash buildnoavb.sh
     - name: Upload
       uses: actions/upload-artifact@v7
       with:
@@ -47,7 +52,12 @@ jobs:
     - uses: rui314/setup-mold@v1  
     - name: Build
       run: |
-        XY_TAG=$(git describe --tags --abbrev=0 origin/main) bash buildnoavbp.sh
+        XY_TAG=$(git describe --tags --abbrev=0 origin/main)
+        # Limpeza total + reconfiguração para evitar estado sujo de build
+        cd "$1"
+        make mrproper >/dev/null 2>&1
+        make -s LLVM=1 O=out $BUILD_ARGS a14noavbp_defconfig >/dev/null 2>&1
+        bash buildnoavbp.sh
     - name: Upload
       uses: actions/upload-artifact@v7
       with:

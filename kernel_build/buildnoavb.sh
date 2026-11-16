@@ -82,7 +82,7 @@ echo "Dtbs Build Started"
 make -j$(nproc --all) -C $(pwd) LDFLAGS="-fuse-ld=mold" O=out $BUILD_ARGS dtbs
 echo "Dtbs Build Finished"
 echo "Normal Build Started"
-make -j$(nproc --all) -C $(pwd) LDFLAGS="-fuse-ld=mold" O=out $BUILD_ARGS
+. -c $(pwd) LDFLAGS="-fuse-ld=mold" O=out mrproper make defconfig
 echo "Normal Build Finished"
 echo "Modules Build Started"
 make -j$(nproc --all) -C $(pwd) LDFLAGS="-fuse-ld=mold" O=out INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install
