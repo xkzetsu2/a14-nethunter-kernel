@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       variant:
-        description: "Variante do kernel"
+        description: "Variante"
         type: choice
         default: noavb
         options: [noavb, noavbp, both]
@@ -34,15 +34,17 @@ jobs:
 
       - uses: rui314/setup-mold@v1
 
-      - name: Toolchain (clang-r450784d)
+      - name: Toolchain
         run: |
           TC="$(dirname "$GITHUB_WORKSPACE")/clang-r450784d"
           git clone --depth=1 https://gitlab.com/tejas101k/clang-r450784d.git "$TC"
           "$TC/bin/clang" --version
 
-      - name: Preparar scripts
+      - name: Preparar scripts (python3 e LOCALVERSION vazio)
         run: |
           sed -i 's/python2 /python3 /' kernel_build/*.sh
+          sed -i 's|LOCALVERSION=-langsdorff-${XY_VERSION#@}-${GIT_COMMIT} |LOCALVERSION= |' kernel_build/buildnoavb.sh kernel_build/buildnoavbp.sh
+          grep -n "BUILD_ARGS=" kernel_build/buildnoavb.sh
           chmod +x kernel_build/*.sh kernel_build/mkbootimg/*.py kernel_build/dtb/*.py || true
 
       - name: Build
@@ -53,22 +55,25 @@ jobs:
           if [ "${{ matrix.variant }}" = "noavbp" ]; then S=buildnoavbp.sh; else S=buildnoavb.sh; fi
           bash "kernel_build/$S" "$(pwd)" 2>&1 | tee build.log
 
-      - name: Config final (KSU/KPM/SUSFS)
-        if: always()
-        run: grep -E "^CONFIG_(KSU|KPM|KSU_SUSFS)=" out/.config || true
+      - name: Reunir saida
+        run: |
+          mkdir dist
+          cp kernel_build/langsdorff*.zip kernel_build/langsdorff*.tar dist/
+          cp out/arch/arm64/boot/Image dist/Image
+          cp out/.config dist/config
+          cp out/include/config/kernel.release dist/kernel.release
+          echo "kernel.release: $(cat dist/kernel.release)"
+          grep -E "^CONFIG_(KSU|KPM|KSU_SUSFS)=" out/.config
+          (cd dist && sha256sum * > sha256sum.txt)
 
-      - name: Upload kernel
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: kernel-${{ matrix.variant }}
-          path: |
-            kernel_build/langsdorff*.zip
-            kernel_build/langsdorff*.tar
+          path: dist/
           if-no-files-found: error
 
-      - name: Upload log
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: log-${{ matrix.variant }}
           path: build.log
