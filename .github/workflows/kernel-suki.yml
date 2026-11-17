@@ -1,0 +1,74 @@
+name: Kernel SukiSU (KPM + SUSFS)
+
+on:
+  push:
+    branches: [suki-builtin]
+  workflow_dispatch:
+    inputs:
+      variant:
+        description: "Variante do kernel"
+        type: choice
+        default: noavb
+        options: [noavb, noavbp, both]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: ${{ fromJSON((inputs.variant || 'noavb') == 'both' && '["noavb","noavbp"]' || format('["{0}"]', inputs.variant || 'noavb')) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dependencias
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            bc bison flex libssl-dev libelf-dev dwarves cpio zip lz4 brotli \
+            python3 python-is-python3 device-tree-compiler xz-utils rsync kmod
+
+      - uses: rui314/setup-mold@v1
+
+      - name: Toolchain (clang-r450784d)
+        run: |
+          TC="$(dirname "$GITHUB_WORKSPACE")/clang-r450784d"
+          git clone --depth=1 https://gitlab.com/tejas101k/clang-r450784d.git "$TC"
+          "$TC/bin/clang" --version
+
+      - name: Preparar scripts
+        run: |
+          sed -i 's/python2 /python3 /' kernel_build/*.sh
+          chmod +x kernel_build/*.sh kernel_build/mkbootimg/*.py kernel_build/dtb/*.py || true
+
+      - name: Build
+        env:
+          XY_TAG: suki-r${{ github.run_number }}
+        run: |
+          set -eo pipefail
+          if [ "${{ matrix.variant }}" = "noavbp" ]; then S=buildnoavbp.sh; else S=buildnoavb.sh; fi
+          bash "kernel_build/$S" "$(pwd)" 2>&1 | tee build.log
+
+      - name: Config final (KSU/KPM/SUSFS)
+        if: always()
+        run: grep -E "^CONFIG_(KSU|KPM|KSU_SUSFS)=" out/.config || true
+
+      - name: Upload kernel
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-${{ matrix.variant }}
+          path: |
+            kernel_build/langsdorff*.zip
+            kernel_build/langsdorff*.tar
+          if-no-files-found: error
+
+      - name: Upload log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: log-${{ matrix.variant }}
+          path: build.log

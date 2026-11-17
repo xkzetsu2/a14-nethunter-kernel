@@ -2,19 +2,13 @@
 #include <linux/kallsyms.h>
 #include <linux/module.h>
 #include <linux/mm.h>
-#include <linux/version.h>
-#include <linux/sched.h> // signal in lower kernel in sched.h
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 10, 0)
 #include <linux/sched/signal.h>
-#endif
 #include <linux/slab.h>
 #include <linux/sort.h>
 #include <linux/string.h>
-#include <linux/vmalloc.h>
+#include <linux/version.h>
 
-#include "klog.h" // IWYU pragma: keep
 #include "infra/symbol_resolver.h"
-#include "compat/kernel_compat.h"
 
 // https://github.com/torvalds/linux/commit/89245600941e4e0f87d77f60ee269b5e61ef4e49
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
@@ -108,7 +102,7 @@ static int lookup_symbol_variant_cb(void *data, const char *name, struct module 
 
     if (strcmp(name, ctx->symbol_name) != 0) {
         if (name_len <= ctx->symbol_len || strncmp(name, ctx->symbol_name, ctx->symbol_len) != 0 ||
-            (name[ctx->symbol_len] != '.' && name[ctx->symbol_len] != '$'))
+            name[ctx->symbol_len] != '.')
             return 0;
     }
 
@@ -320,7 +314,7 @@ int __nocfi ksu_lookup_kernel_symbols(const char *const *names, unsigned long *a
     ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
     if (!ctx)
         return -ENOMEM;
-    ctx->entries = vmalloc(count * sizeof(*ctx->entries));
+    ctx->entries = kvmalloc_array(count, sizeof(*ctx->entries), GFP_KERNEL);
     if (!ctx->entries) {
         kfree(ctx);
         return -ENOMEM;
@@ -375,7 +369,7 @@ int __nocfi ksu_lookup_kernel_symbols(const char *const *names, unsigned long *a
         }
     }
 
-    vfree(ctx->entries);
+    kvfree(ctx->entries);
     kfree(ctx);
     return ret;
 }
@@ -383,7 +377,7 @@ int __nocfi ksu_lookup_kernel_symbols(const char *const *names, unsigned long *a
 void __init ksu_init_symbol_resolver()
 {
 #if !ALWAYS_HAVE_ON_EACH_SYMBOL
-    kallsyms_on_each_symbol_fn = (void *)find_kernel_symbol_exact("kallsyms_on_each_symbol");
+    kallsyms_on_each_symbol_fn = find_kernel_symbol_exact("kallsyms_on_each_symbol");
     if (!kallsyms_on_each_symbol_fn) {
         pr_warn("kallsyms_on_each_symbol not found!\n");
     }

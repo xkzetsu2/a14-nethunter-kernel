@@ -82,7 +82,7 @@ echo "Dtbs Build Started"
 make -j$(nproc --all) -C $(pwd) LDFLAGS="-fuse-ld=mold" O=out $BUILD_ARGS dtbs
 echo "Dtbs Build Finished"
 echo "Normal Build Started"
-. -c $(pwd) LDFLAGS="-fuse-ld=mold" O=out mrproper make defconfig
+make -j$(nproc --all) -C $(pwd) LDFLAGS="-fuse-ld=mold" O=out $BUILD_ARGS
 echo "Normal Build Finished"
 echo "Modules Build Started"
 make -j$(nproc --all) -C $(pwd) LDFLAGS="-fuse-ld=mold" O=out INSTALL_MOD_STRIP="--strip-debug --keep-section=.ARM.attributes" INSTALL_MOD_PATH="$MODULES_OUTDIR" modules_install
@@ -141,7 +141,7 @@ mv "$MODULES_DIR/0.0"/* "$MODULES_DIR/"
 rm -rf "$MODULES_DIR/0.0"
 
 echo "Building dtb image..."
-python2 "$MKDTBOIMG" create "$OUT_DTBIMAGE" --custom0=0x00000000 --custom1=0xff000000 --version=0 --page_size=2048 "$IN_DTB" || exit 1
+python3 "$MKDTBOIMG" create "$OUT_DTBIMAGE" --custom0=0x00000000 --custom1=0xff000000 --version=0 --page_size=2048 "$IN_DTB" || exit 1
 
 echo "Building boot image..."
 
