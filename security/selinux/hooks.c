@@ -106,7 +106,7 @@
 
 struct selinux_state selinux_state;
 #ifdef CONFIG_KSU_SUSFS
-extern struct selinux_state fake_state;
+#define fake_state selinux_state
 extern bool ksu_selinux_hide_running __read_mostly;
 #endif // #ifdef CONFIG_KSU_SUSFS
 
