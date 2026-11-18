@@ -240,4 +240,8 @@ void susfs_start_sdcard_monitor_fn(void);
 /* susfs_init */
 void susfs_init(void);
 
+#define CMD_SUSFS_SET_PRIORITY_UID_FILTER 0x60030
+static inline void susfs_parse_priority_app_strings(void) {}
+static inline int susfs_set_priority_uid_filter(void __user *arg) { return 0; }
 #endif
+
