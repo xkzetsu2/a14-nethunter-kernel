@@ -9,7 +9,6 @@ pinctrl-samsung-core.ko
 i2c-exynos5.ko
 i2c-s3c2410.ko
 sec_debug_mode.ko
-ems.ko
 zsmalloc.ko
 phy-exynos-mipi-dsim.ko
 phy-exynos-mipi.ko
