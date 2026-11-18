@@ -51,7 +51,6 @@ exynos-cpupm.ko
 exynos-cpuhp.ko
 exynos-ufcc.ko
 input_booster_lkm.ko
-xperf.ko
 gnss_mbox.ko
 gnssif.ko
 mcu_ipc.ko
