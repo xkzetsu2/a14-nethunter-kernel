@@ -102,12 +102,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: kernel-${{ matrix.variant }}-kpm
-          path: dist-kpm/
-          if-no-files-found: warn
-
-      - uses: actions/upload-artifact@v4
-        with:
           name: kernel-${{ matrix.variant }}
           path: dist/
           if-no-files-found: error
