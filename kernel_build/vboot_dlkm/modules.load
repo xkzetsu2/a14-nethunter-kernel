@@ -157,6 +157,10 @@ pinctrl-samsung-core.ko
 pl330.ko
 pmic_class.ko
 pwm-samsung.ko
+rt2800lib.ko
+rt2800usb.ko
+rt2x00lib.ko
+rt2x00usb.ko
 rtc-s2mpu12.ko
 rtl8187.ko
 rtl8xxxu.ko
