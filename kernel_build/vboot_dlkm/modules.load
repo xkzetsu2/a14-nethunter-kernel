@@ -251,15 +251,5 @@ sec_audio_debug.ko
 tcp_westwood.ko
 tcp_htcp.ko
 rtl8xxxu.ko
-btusb.ko
-carl9170.ko
-ch341.ko
-cp210x.ko
-ftdi_sio.ko
-gs_usb.ko
 mt7601u.ko
-rt2800lib.ko
-rt2800usb.ko
-rt2x00lib.ko
-rt2x00usb.ko
 rtl8187.ko
