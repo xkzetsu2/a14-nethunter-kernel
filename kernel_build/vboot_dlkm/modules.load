@@ -142,6 +142,7 @@ mali_kbase.ko
 mcd-panel.ko
 mcu_ipc.ko
 mfd_s2mu106.ko
+mt7601u.ko
 muic_platform.ko
 muic_s2mu106.ko
 mx_client_test.ko
