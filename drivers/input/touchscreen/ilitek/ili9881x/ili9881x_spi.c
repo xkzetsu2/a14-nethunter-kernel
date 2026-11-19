@@ -638,10 +638,10 @@ static int ilitek_spi_probe(struct spi_device *spi)
 	ilits->started_prox_intensity = false;
 	ilits->incell_power_state = false;
 	ilits->prox_face_mode = false;
-	ilits->dead_zone_enabled = true; //default true at fw
+	ilits->dead_zone_enabled = false; /* tweak: zona morta off */
 	ilits->sip_mode_enabled = false;
-	ilits->high_sensitivity_mode_enabled = false;
-	ilits->game_mode_enabled = false;
+	ilits->high_sensitivity_mode_enabled = true; /* tweak: glove_mode on */
+	ilits->game_mode_enabled = true; /* tweak: game_mode on */
 	ilits->clear_cover_mode_enabled = false;
 	ilits->prox_lp_scan_mode_enabled = false;
 	ilits->sleep_handler_mode = TP_RESUME;
