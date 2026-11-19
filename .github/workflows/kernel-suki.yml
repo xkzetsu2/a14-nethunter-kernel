@@ -55,6 +55,10 @@ jobs:
           if [ "${{ matrix.variant }}" = "noavbp" ]; then S=buildnoavbp.sh; else S=buildnoavb.sh; fi
           bash "kernel_build/$S" "$(pwd)" 2>&1 | tee build.log
 
+      - name: DEBUG listar ko novos wifi
+        run: |
+          find out -name "*.ko" | xargs -n1 basename | sort > all_ko.txt
+          grep -E "mt7601u|rt2800usb|rt2x00usb|rt2x00lib|rtl8187|carl9170|^ath\.ko|mac80211\.ko|cfg80211\.ko" all_ko.txt || echo "NENHUM ENCONTRADO"
       - name: Reunir saida
         run: |
           mkdir dist
