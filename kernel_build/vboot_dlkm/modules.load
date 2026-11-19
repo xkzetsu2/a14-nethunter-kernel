@@ -4,13 +4,16 @@ abc.ko
 acecad.ko
 acpm-mfd-bus.ko
 aiptek.ko
+btusb.ko
 camerapp.ko
 carl9170.ko
 cdc_mbim.ko
 cdc-wdm.ko
+ch341.ko
 clk_exynos.ko
 cmupmucal.ko
 common_muic.ko
+cp210x.ko
 cpif.ko
 cpif_page.ko
 cqhci.ko
@@ -73,10 +76,12 @@ fingerprint_sysfs.ko
 fm_s610.ko
 focaltech_ts_ft8720.ko
 freq-qos-tracer.ko
+ftdi_sio.ko
 gdc.ko
 gnssif.ko
 gnss_mbox.ko
 gpu_cooling.ko
+gs_usb.ko
 hanwang.ko
 hardlockup-watchdog.ko
 hid-a4tech.ko
@@ -137,7 +142,6 @@ mali_kbase.ko
 mcd-panel.ko
 mcu_ipc.ko
 mfd_s2mu106.ko
-mt7601u.ko
 muic_platform.ko
 muic_s2mu106.ko
 mx_client_test.ko
@@ -152,9 +156,6 @@ pinctrl-samsung-core.ko
 pl330.ko
 pmic_class.ko
 pwm-samsung.ko
-rt2800usb.ko
-rt2x00lib.ko
-rt2x00usb.ko
 rtc-s2mpu12.ko
 rtl8187.ko
 rtl8xxxu.ko
