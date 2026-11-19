@@ -66,6 +66,74 @@ jobs:
           grep -E "^CONFIG_(KSU|KPM|KSU_SUSFS)=" out/.config
           (cd dist && sha256sum * > sha256sum.txt)
 
+      - name: KPM (patch do boot.img, artifact separado)
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KPM_SUPERKEY: ${{ secrets.KPM_SUPERKEY }}
+        run: |
+          set -eo pipefail
+          KP_TAG=0.14.0
+          mkdir -p kpm dist-kpm && cd kpm
+          gh release download "$KP_TAG" -R ShirkNeko/SukiSU_KernelPatch_patch -p kpimg -p kptools-linux
+          chmod +x kptools-linux
+          sha256sum kpimg kptools-linux
+          KEY="${KPM_SUPERKEY:-$(openssl rand -hex 12)}"
+          Z=$(ls ../kernel_build/langsdorff*.zip)
+          T=$(ls ../kernel_build/langsdorff*.tar)
+          mkdir z t
+          unzip -q "$Z" -d z
+          brotli -d -c z/boot.br > boot.img
+          ./kptools-linux -p -i boot.img -k kpimg -s "$KEY" -o boot-kp.img > kptools.log 2>&1 || { tail -30 kptools.log; exit 1; }
+          [ "$(stat -c%s boot-kp.img)" -gt "$(stat -c%s boot.img)" ]
+          brotli --quality=6 -c boot-kp.img > z/boot.br
+          (cd z && zip -r9 -q "../../dist-kpm/$(basename "$Z" .zip)-KPM.zip" .)
+          tar -xf "$T" -C t
+          lz4 -c -12 -B6 --content-size boot-kp.img > t/boot.img.lz4
+          (cd t && tar -cf "../../dist-kpm/$(basename "$T" .tar)-KPM.tar" boot.img.lz4 vendor_boot.img.lz4 vbmeta.img.lz4)
+          (cd ../dist-kpm && sha256sum * > sha256sum.txt)
+          ls -l ../dist-kpm
+
+      - name: KPM (patch do boot.img, artifact separado)
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KPM_SUPERKEY: ${{ secrets.KPM_SUPERKEY }}
+        run: |
+          set -eo pipefail
+          KP_TAG=0.14.0
+          mkdir -p kpm dist-kpm && cd kpm
+          gh release download "$KP_TAG" -R ShirkNeko/SukiSU_KernelPatch_patch -p kpimg -p kptools-linux
+          chmod +x kptools-linux
+          sha256sum kpimg kptools-linux
+          KEY="${KPM_SUPERKEY:-$(openssl rand -hex 12)}"
+          Z=$(ls ../kernel_build/langsdorff*.zip)
+          T=$(ls ../kernel_build/langsdorff*.tar)
+          mkdir z t
+          unzip -q "$Z" -d z
+          brotli -d -c z/boot.br > boot.img
+          ./kptools-linux -p -i boot.img -k kpimg -s "$KEY" -o boot-kp.img > kptools.log 2>&1 || { tail -30 kptools.log; exit 1; }
+          [ "$(stat -c%s boot-kp.img)" -gt "$(stat -c%s boot.img)" ]
+          brotli --quality=6 -c boot-kp.img > z/boot.br
+          (cd z && zip -r9 -q "../../dist-kpm/$(basename "$Z" .zip)-KPM.zip" .)
+          tar -xf "$T" -C t
+          lz4 -c -12 -B6 --content-size boot-kp.img > t/boot.img.lz4
+          (cd t && tar -cf "../../dist-kpm/$(basename "$T" .tar)-KPM.tar" boot.img.lz4 vendor_boot.img.lz4 vbmeta.img.lz4)
+          (cd ../dist-kpm && sha256sum * > sha256sum.txt)
+          ls -l ../dist-kpm
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kernel-${{ matrix.variant }}-kpm
+          path: dist-kpm/
+          if-no-files-found: warn
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kernel-${{ matrix.variant }}-kpm
+          path: dist-kpm/
+          if-no-files-found: warn
+
       - uses: actions/upload-artifact@v4
         with:
           name: kernel-${{ matrix.variant }}
